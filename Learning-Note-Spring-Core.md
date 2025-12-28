@@ -1559,15 +1559,241 @@ Annotations = ID cards 🪪
 | `@Repository`    | ✅ Yes         |
 | `@Bean` method   | ✅ Yes         |
 
-### Stereotype Annotations
+---
+
+# 🌱 Spring Bean Lifecycle 
+
+## ✅ What is Spring Bean Lifecycle?
+
+Spring Bean Lifecycle describes:
+
+> **The steps a bean goes through from creation to destruction inside the Spring IoC container.**
+
+## 🔁 COMPLETE LIFECYCLE FLOW (INTERVIEW MUST)
+
+```
+1. Bean Instantiation
+2. Dependency Injection
+3. Aware Interfaces (optional)
+4. BeanPostProcessor (Before Init)
+5. Initialization Phase
+   ├─ @PostConstruct
+   ├─ afterPropertiesSet() (InitializingBean)
+   ├─ Custom Init Method
+6. BeanPostProcessor (After Init)
+7. Bean Ready to Use
+8. Destruction Phase
+```
+
+## 🔍 STEP-BY-STEP EXPLANATION
+
+## 1️⃣ Bean Instantiation
+
+* Spring creates the bean object
+* Uses constructor (default or parameterized)
+
+```java
+@Component
+class Car {
+    public Car() {
+        System.out.println("Bean instantiated");
+    }
+}
+```
+
+## 2️⃣ Dependency Injection
+
+* Spring injects dependencies using:
+
+  * Constructor
+  * Setter
+  * `@Autowired`
+
+```java
+@Autowired
+Engine engine;
+```
+
+📌 **Important:**
+
+> All dependencies are injected **before initialization starts**
+
+## 3️⃣ Aware Interfaces (Optional)
+
+If a bean implements these, Spring injects internal objects:
+
+* `BeanNameAware`
+* `BeanFactoryAware`
+* `ApplicationContextAware`
+
+👉 Rarely used, but good for interviews.
+
+## 4️⃣ BeanPostProcessor (Before Initialization)
+
+Spring internally calls:
+
+```java
+postProcessBeforeInitialization()
+```
+
+Used for:
+
+* Validation
+* Proxy preparation
+
+### 5️⃣ Initialization Phase ⭐ (VERY IMPORTANT)
+
+Initialization happens **AFTER dependency injection**.
+
+> **Spring provides 3 ways to initialize a bean: @PostConstruct, InitializingBean, and a custom init method defined using configuration.**
+
+Bean is initialized using any of these:
+
+### a) `@PostConstruct` (Recommended)
+
+```java
+@PostConstruct
+public void init() {
+    System.out.println("PostConstruct called");
+}
+```
+
+### b) `InitializingBean`
+
+```java
+public class Car implements InitializingBean {
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("InitializingBean called");
+    }
+}
+```
+
+### c) **Custom Init Method** (Explicit Configuration) ⭐
+
+### a) Java Config (Spring / Spring Boot)
+
+Defined using `@Bean`
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean(initMethod = "customInit")
+    public Car car() {
+        return new Car();
+    }
+}
+```
+
+```java
+public class Car {
+    public void customInit() {
+        System.out.println("Custom init called");
+    }
+}
+```
+
+### b) XML Config (Old Style)
+
+```xml
+<bean id="car"
+      class="com.Car"
+      init-method="customInit"/>
+```
+
+📌 Points:
+
+* Bean class remains clean
+* Method name can be anything
+* Works in both Spring & Spring Boot
+
+> ✅ **After DI and after @PostConstruct / InitializingBean, but before bean is ready to use**
+
+## 6️⃣ BeanPostProcessor (After Initialization)
+
+Spring calls:
+
+```java
+postProcessAfterInitialization()
+```
+
+Used for:
+
+* AOP
+* Transaction management
+* Security proxies
+
+## 7️⃣ Bean Ready to Use
+
+* Bean is fully created
+* Bean is injected wherever required
+* Application can use it
+
+## 8️⃣ Destruction Phase ⭐
+
+Occurs when container shuts down.
+
+### a) `@PreDestroy`
+
+```java
+@PreDestroy
+public void destroy() {
+    System.out.println("Cleanup logic");
+}
+```
+
+### b) `DisposableBean`
+
+```java
+destroy()
+```
+
+### c) `destroy-method` (XML)
+
+⚠️ Important:
+
+> Destruction callbacks are **NOT called for prototype beans**
+
+## 🧠 EASY MEMORY FLOW (WRITE THIS)
+
+```
+Constructor
+→ Autowire
+→ @PostConstruct
+→ Custom Init
+→ Ready
+→ @PreDestroy
+```
+
+## ❓ Spring Boot Impact
+
+❌ Spring Boot does **NOT** change bean lifecycle
+✔️ Same lifecycle rules apply
+
+Spring Boot only:
+
+* Creates IoC container automatically
+* Reduces configuration
+
+## 🎯 PERFECT INTERVIEW ANSWER
+
+> **Spring Bean Lifecycle consists of instantiation, dependency injection, initialization, and destruction. Initialization includes @PostConstruct, InitializingBean, and custom init methods, which are executed after dependency injection and before the bean is ready for use. Spring Boot follows the same lifecycle.**
+
+---
+
+
+
+
+---
+
+# Stereotype Annotations
 
 ### ✅ What is **Annotation-Based Configuration** (Stereotype Annotations)?
 
 **Annotation-based configuration** means **using annotations instead of XML** to define and manage Spring beans.
 
 👉 Spring automatically **creates objects (beans)** and **manages them** using annotations.
-
----
 
 ### 🔹 What are **Stereotype Annotations**?
 
@@ -1655,8 +1881,6 @@ or in Spring Boot:
 ### 🎯 One-Line Interview Answer
 
 > **Annotation-based configuration uses stereotype annotations like @Component, @Service, @Repository, and @Controller to define Spring beans without XML.**
-
----
 
 ### 🧠 Easy Memory Trick
 
