@@ -1,4 +1,4 @@
-### Spring - Dependency Injection
+# Spring - Dependency Injection
 
 ## First: What is a “dependency”? 
 
@@ -13,8 +13,6 @@ Example:
 So,
 👉 *Engine is a dependency of Car*
 
----
-
 ## Now: What is “Dependency Injection”?
 
 **Dependency Injection = Giving what is needed from outside**
@@ -28,8 +26,6 @@ We say:
 > “Someone else will give me what I need”
 
 That **someone else** is **Spring**.
-
----
 
 ## ❌ Life WITHOUT Dependency Injection (Normal Java)
 
@@ -159,11 +155,11 @@ That’s it. Nothing magical.
 
 ---
 
-## Types of DI
+# Types of DI
 
-# PART 1: First understand the BASIC PROBLEM (before IoC / DI)
+### PART 1: First understand the BASIC PROBLEM (before IoC / DI)
 
-## Imagine ONLY normal Java (no Spring)
+### Imagine ONLY normal Java (no Spring)
 
 ```java
 class Engine {
@@ -185,9 +181,7 @@ class Car {
 
 This is the **problem**.
 
----
-
-## Why is this a problem? (Very important)
+### Why is this a problem? (Very important)
 
 Suppose tomorrow:
 
@@ -197,11 +191,9 @@ Now you must change `Car` code.
 
 👉 **Car is tightly tied to Engine**
 
----
+### PART 2: The IDEA — IoC (Inversion of Control)
 
-# PART 2: The IDEA — IoC (Inversion of Control)
-
-## What is IoC REALLY?
+### What is IoC REALLY?
 
 IoC is just a **decision**:
 
@@ -211,7 +203,7 @@ That’s it. No magic.
 
 ---
 
-## What changes with IoC?
+# What changes with IoC?
 
 ### ❌ Old thinking
 
@@ -225,17 +217,13 @@ That **someone else** = **Spring**
 
 👉 Control is **inverted** (reversed).
 
----
-
-## IoC is NOT code
+### IoC is NOT code
 
 IoC is **who is in charge**.
 
----
+### PART 3: Now HOW does Spring help? → DI
 
-# PART 3: Now HOW does Spring help? → DI
-
-## DI = Dependency Injection
+### DI = Dependency Injection
 
 Plain meaning:
 
@@ -246,11 +234,9 @@ So:
 * You stop creating
 * Spring starts giving
 
----
+### PART 4: Slowly build a Spring example
 
-# PART 4: Slowly build a Spring example
-
-## Step 1: Tell Spring which classes it must manage
+### Step 1: Tell Spring which classes it must manage
 
 ```java
 @Component
@@ -268,9 +254,7 @@ Now Spring says:
 
 > “Okay, I will create these objects.”
 
----
-
-## Step 2: Remove `new`
+### Step 2: Remove `new`
 
 ❌ Don’t do this anymore:
 
@@ -278,19 +262,13 @@ Now Spring says:
 new Engine();
 ```
 
----
-
-## Step 3: Ask Spring to give Engine to Car
+### Step 3: Ask Spring to give Engine to Car
 
 Now we reach **DI types**.
 
----
+### PART 5: Types of Dependency Injection (Very Slowly)
 
-# PART 5: Types of Dependency Injection (Very Slowly)
-
----
-
-## 🔹 Type 1: Constructor Injection (Start here)
+### 🔹 Type 1: Constructor Injection (Start here)
 
 ### Code:
 
@@ -316,17 +294,13 @@ class Car {
 4. Spring gives Engine
 5. Car is created
 
----
-
 ### Plain meaning:
 
 > “Car CANNOT exist without Engine.”
 
 This is **safe and clean**.
 
----
-
-## 🔹 Type 2: Setter Injection (Slower & optional)
+### 🔹 Type 2: Setter Injection (Slower & optional)
 
 ### Code:
 
@@ -350,15 +324,11 @@ class Car {
 3. Spring calls `setEngine()`
 4. Engine is set later
 
----
-
 ### Plain meaning:
 
 > “Car can exist without Engine, but Engine can be added later.”
 
----
-
-## 🔹 Type 3: Field Injection (Shortcut)
+### 🔹 Type 3: Field Injection (Shortcut)
 
 ### Code:
 
@@ -376,17 +346,13 @@ class Car {
 1. Spring creates Car
 2. Spring puts Engine directly into field
 
----
-
 ### Why is this bad?
 
 * Hidden dependency
 * Hard to test
 * Not clear from constructor
 
----
-
-# PART 6: Compare all three (VERY CLEAR)
+### PART 6: Compare all three (VERY CLEAR)
 
 | Question                      | Constructor | Setter         | Field          |
 | ----------------------------- | ----------- | -------------- | -------------- |
@@ -395,9 +361,7 @@ class Car {
 | Safe?                         | ✅ Yes       | ⚠️ Medium      | ❌ No           |
 | Recommended?                  | ✅ Best      | ⚠️ Sometimes   | ❌ Avoid        |
 
----
-
-# PART 7: Now connect IoC + DI (MOST IMPORTANT)
+### PART 7: Now connect IoC + DI (MOST IMPORTANT)
 
 ### IoC:
 
@@ -407,16 +371,12 @@ class Car {
 
 > “Spring gives needed objects.”
 
----
-
 ### In one flow:
 
 1. Spring controls creation → **IoC**
 2. Spring injects dependencies → **DI**
 
----
-
-# PART 8: Final mental picture 🧠
+### PART 8: Final mental picture 🧠
 
 ### Without Spring
 
@@ -444,7 +404,7 @@ You:
 
 ---
 
-##  DI Type to Use - senario
+#  DI Type to Use - senario
 
 ## 1️⃣ What is SETTER Injection? (Reminder)
 
@@ -465,13 +425,7 @@ Plain meaning:
 
 > “Create the object first, then give the dependency later.”
 
----
-
 ## 2️⃣ FIELD vs SETTER vs CONSTRUCTOR (Big Picture)
-
-We’ll compare **only what matters**.
-
----
 
 ## 🔴 1. Visibility of dependency (MOST IMPORTANT)
 
@@ -492,8 +446,6 @@ class Car {
 
 Hidden dependency ❌
 
----
-
 ### Setter Injection ⚠️
 
 ```java
@@ -507,8 +459,6 @@ void setEngine(Engine engine) { }
 Better than field ✔
 Still not perfect ⚠️
 
----
-
 ### Constructor Injection ✅
 
 ```java
@@ -520,8 +470,6 @@ Car(Engine engine) { }
 
 Best ✅
 
----
-
 ## 🔴 2. Object safety (null problem)
 
 ### Field Injection ❌
@@ -531,8 +479,6 @@ Best ✅
 
 Risk of `NullPointerException`
 
----
-
 ### Setter Injection ⚠️
 
 * Same issue
@@ -540,14 +486,10 @@ Risk of `NullPointerException`
 
 Still risky
 
----
-
 ### Constructor Injection ✅
 
 * Object cannot exist without Engine
 * No null state
-
----
 
 ## 🔴 3. Testing without Spring
 
@@ -558,8 +500,6 @@ Hard to test:
 ```java
 Car car = new Car(); // engine is null
 ```
-
----
 
 ### Setter Injection ⚠️
 
@@ -572,8 +512,6 @@ car.setEngine(new Engine());
 
 Works, but easy to forget
 
----
-
 ### Constructor Injection ✅
 
 Easy & clean:
@@ -582,8 +520,6 @@ Easy & clean:
 Car car = new Car(new Engine());
 ```
 
----
-
 ## 🔴 4. Immutability (simple explanation)
 
 ### Field Injection ❌
@@ -591,21 +527,15 @@ Car car = new Car(new Engine());
 * Cannot use `final`
 * Object can change
 
----
-
 ### Setter Injection ⚠️
 
 * Can change engine anytime
 * Less stable
 
----
-
 ### Constructor Injection ✅
 
 * `final` possible
 * Object is fixed after creation
-
----
 
 ## 🔴 5. Design intention
 
@@ -615,8 +545,6 @@ Car car = new Car(new Engine());
 | Setter         | “Optional dependency” |
 | Constructor    | “Required dependency” |
 
----
-
 ## 🧠 Real-life analogy 🚗
 
 ### Field Injection
@@ -624,21 +552,15 @@ Car car = new Car(new Engine());
 You get a car
 Someone secretly adds engine later 😬
 
----
-
 ### Setter Injection
 
 You get a car
 You *may* add engine later ⚠️
 
----
-
 ### Constructor Injection
 
 You get a complete car
 Engine already installed ✅
-
----
 
 ## 🧠 Final comparison table (Very clear)
 
@@ -659,8 +581,6 @@ Engine already installed ✅
 ## 🧠 One-line memory sentence
 
 > **Constructor = required, Setter = optional, Field = hidden.**
-
----
 
 ### Inversion of Control
 
@@ -756,8 +676,6 @@ You:
 
 You control everything.
 
----
-
 #### ✅ With IoC
 
 Office:
@@ -813,7 +731,7 @@ What happens?
 
 ---
 
-### How the Object creation happends inside Ioc 
+# How the Object creation happends inside Ioc 
 
 ## First: Important Truth 🌱
 
@@ -975,12 +893,7 @@ Spring controls it → IoC ✔
 
 ---
 
-👍 **Yes — you’re right. There are *3 ways* to create the IoC container in Spring.**
-Let’s keep it **simple, clear, and interview-friendly** 👇
-
----
-
-## ✅ 3 Ways to Create IoC Container (Spring Framework)
+# ✅ 3 Ways to Create IoC Container (Spring Framework)
 
 ### 1️⃣ **Using XML Configuration**
 
@@ -993,8 +906,6 @@ ApplicationContext context =
 
 🧠 **Remember:**
 XML → `ClassPathXmlApplicationContext`
-
----
 
 ### 2️⃣ **Using Java Configuration (Annotations)**
 
@@ -1013,8 +924,6 @@ public class AppConfig {
 🧠 **Remember:**
 Java class → `AnnotationConfigApplicationContext`
 
----
-
 ### 3️⃣ **Using Spring Boot**
 
 ```java
@@ -1025,8 +934,6 @@ SpringApplication.run(MyApplication.class, args);
 
 🧠 **Remember:**
 Boot → `SpringApplication.run()`
-
----
 
 ## 🎯 Interview Answer (Perfect)
 
@@ -1059,7 +966,7 @@ Strictly speaking:
 
 ---
 
-### @Bean Vs @Component
+# @Bean Vs @Component
 
 ## First: What do both do?
 
@@ -1214,7 +1121,7 @@ Creation **must happen first**.
 
 ---
 
-### @Bean with DI & why external classes inside @Bean?
+# @Bean with DI & why external classes inside @Bean?
 
 ## ❓ Can we use **external classes** with **DI**?
 
@@ -1302,8 +1209,6 @@ If Spring **did NOT create** `ObjectMapper`, then:
 ❌ Spring has nothing to inject
 ❌ `@Autowired` fails
 
----
-
 ## ❓ Why Spring does NOT always create ObjectMapper?
 
 Because:
@@ -1311,8 +1216,6 @@ Because:
 * Spring **does not automatically create every class**
 * Spring creates **only beans**
 * External classes are **NOT beans by default**
-
----
 
 ## ❌ What you wrote (why it doesn’t work)
 
@@ -1343,8 +1246,6 @@ Because you did NOT tell Spring:
 
 So Spring never used `new ObjectMapper()`.
 
----
-
 ## ✅ When does `@Autowired ObjectMapper` WORK?
 
 ### Case 1: You define it using `@Bean`
@@ -1367,8 +1268,6 @@ Now Spring has it ✔
 ObjectMapper mapper; // works
 ```
 
----
-
 ### Case 2: Spring Boot Auto-Configuration
 
 Spring Boot **automatically creates** some beans.
@@ -1379,8 +1278,6 @@ Example:
 * `DataSource`
 
 So this works **only if auto-config is enabled**.
-
----
 
 ## 🧠 So where is `new` actually used?
 
@@ -1401,8 +1298,6 @@ class Service {
 }
 ```
 
----
-
 ## 🔄 Why using `new` in service breaks IoC?
 
 Because:
@@ -1413,8 +1308,6 @@ Because:
 * No injection
 
 Spring is **out of control** ❌
-
----
 
 ## 🧠 Why `new` is forbidden in business classes?
 
@@ -1525,7 +1418,7 @@ class MyService {
 
 ---
 
-## ❓ Are our Java classes beans by default?
+# ❓ Are our Java classes beans by default?
 
 ### ❌ **NO**
 
@@ -1533,13 +1426,9 @@ class MyService {
 
 Spring does **NOT** automatically manage every class you write.
 
----
-
 ## 🧠 Simple rule (remember this)
 
 > **A class becomes a Spring bean ONLY if Spring knows about it.**
-
----
 
 ## ❌ Normal Java class (NOT a bean)
 
@@ -1554,13 +1443,9 @@ This is just:
 * Spring ignores it
 * You cannot `@Autowired` it
 
----
-
 ## ✅ How does a class become a bean?
 
 You must **explicitly tell Spring**.
-
----
 
 ## 🟢 Method 1: `@Component` (Most common)
 
@@ -1577,8 +1462,6 @@ Now:
 * Manages it
 
 ✔ It is a bean
-
----
 
 ## 🟢 Method 2: Stereotype annotations
 
@@ -1601,8 +1484,6 @@ class StudentService {
 
 ✔ Bean created
 
----
-
 ## 🟢 Method 3: `@Bean`
 
 ```java
@@ -1618,8 +1499,6 @@ class AppConfig {
 
 ✔ Bean created
 
----
-
 ## ❓ Why do we need to “create” beans?
 
 Because:
@@ -1629,8 +1508,6 @@ Because:
 * You may have helper or utility classes
 
 So **you decide**.
-
----
 
 ## 🧠 Important clarification (Common confusion)
 
@@ -1642,8 +1519,6 @@ StudentService service;
 ```
 
 if `StudentService` has **no annotation**.
-
----
 
 ### ✅ This WILL work
 
@@ -1658,8 +1533,6 @@ class StudentService {
 StudentService service;
 ```
 
----
-
 ## 🧠 Real-life analogy
 
 ### Your house 🏠
@@ -1671,8 +1544,6 @@ Spring container:
 * Only classes marked as beans get entry
 
 Annotations = ID cards 🪪
-
----
 
 ## 🧠 One-line answer
 
@@ -1687,8 +1558,6 @@ Annotations = ID cards 🪪
 | `@Service`       | ✅ Yes         |
 | `@Repository`    | ✅ Yes         |
 | `@Bean` method   | ✅ Yes         |
-
----
 
 ## Stereotype Annotations
 
@@ -1706,8 +1575,6 @@ Stereotype annotations tell Spring:
 
 > **“This class is a Spring bean — manage it in the IoC container.”**
 
----
-
 ## ⭐ Main Stereotype Annotations (MOST IMPORTANT)
 
 ### 1️⃣ `@Component`
@@ -1721,8 +1588,6 @@ public class Engine {
 }
 ```
 
----
-
 ### 2️⃣ `@Service`
 
 👉 Used in **Service / Business Logic layer**
@@ -1732,8 +1597,6 @@ public class Engine {
 public class PaymentService {
 }
 ```
-
----
 
 ### 3️⃣ `@Repository`
 
@@ -1747,8 +1610,6 @@ public class UserRepository {
 
 ✔️ Provides **exception translation** (important interview point)
 
----
-
 ### 4️⃣ `@Controller`
 
 👉 Used in **Spring MVC** (Web layer)
@@ -1758,8 +1619,6 @@ public class UserRepository {
 public class UserController {
 }
 ```
-
----
 
 ### 5️⃣ `@RestController`
 
@@ -1777,8 +1636,6 @@ public class UserRestController {
 @Controller + @ResponseBody
 ```
 
----
-
 ## 🔁 How Spring Finds These Beans?
 
 Using **component scanning** 👇
@@ -1794,8 +1651,6 @@ or in Spring Boot:
 ```
 
 (Already includes component scanning ✅)
-
----
 
 ## 🎯 One-Line Interview Answer
 
