@@ -1782,8 +1782,254 @@ Spring Boot only:
 
 ---
 
+# ❓ Why Do We Need an Init Method in Spring?
 
+## ✅ Short Answer (Interview)
 
+> **We need an init method to perform initialization logic after all dependencies are injected but before the bean is used.**
+
+### 🔹 What Problem Does Init Method Solve?
+
+### Without Init Method ❌
+
+* Bean is created
+* Dependencies may not be ready when constructor runs
+* Complex setup cannot be safely done in constructor
+
+### With Init Method ✅
+
+* Bean is **fully created**
+* All dependencies are **already injected**
+* Safe place to perform setup logic
+
+### 🔍 What Kind of Logic Goes in Init Method?
+
+### Common Real-Time Examples:
+
+1️⃣ **Validate injected dependencies**
+
+```java
+@PostConstruct
+public void init() {
+    if (dataSource == null) {
+        throw new IllegalStateException("DataSource not injected");
+    }
+}
+```
+
+2️⃣ **Open resources**
+
+* Database connections
+* File streams
+* Socket connections
+
+3️⃣ **Load cache / configuration**
+
+```java
+@PostConstruct
+public void loadCache() {
+    cache = loadFromDB();
+}
+```
+
+4️⃣ **Pre-compute values**
+
+* Encryption keys
+* Lookup tables
+
+5️⃣ **Start background tasks**
+
+* Schedulers
+* Polling threads
+
+## 🔹 Why NOT Use Constructor for This?
+
+| Constructor                      | Init Method                |
+| -------------------------------- | -------------------------- |
+| Dependencies may not be injected | All dependencies are ready |
+| Object creation only             | Full initialization        |
+| Limited logic recommended        | Best for heavy logic       |
+
+🎯 Interview line:
+
+> Constructors should be lightweight; heavy initialization belongs in init methods.
+
+## ❓ Is Init Method Still Needed in Spring Boot?
+
+✅ YES — 100%
+
+⚠️ Important:
+
+> **Spring Boot does NOT remove the need for init methods.**
+
+Boot:
+
+* Creates container automatically
+* Follows same lifecycle rules
+
+## ⚠️ Interview Trap
+
+**Q: Can we skip init method?**
+
+✔️ Yes, **if no post-injection logic is required**
+❌ No, **if setup depends on injected beans**
+
+## 🎯 Perfect Interview Answer (Say This)
+
+> **Init methods are used to execute initialization logic after dependency injection is completed. They ensure the bean is in a fully usable state before being accessed. Spring Boot follows the same lifecycle.**
+
+## 🧠 Easy Memory Line
+
+```
+Constructor → Create object
+Init method → Prepare object
+```
+
+---
+
+# 🌱 Spring Bean Scopes 
+
+### ✅ What is a Bean Scope?
+
+A **bean scope** defines: **How many instances of a bean Spring creates and how long they live inside the IoC container.**
+
+👉 🔹 Default Scope - **singleton** - Main Bean Scopes in Spring
+
+## 1️⃣ Singleton (DEFAULT) ⭐
+
+```java
+@Component
+@Scope("singleton")
+public class Car { }
+```
+
+### Meaning:
+
+* **One bean instance per IoC container**
+* Same object shared everywhere
+
+### Points:
+
+* Created at startup (eager by default)
+* Destruction managed by Spring
+
+⚠️ Trap:
+
+> Singleton ≠ one object per JVM
+> It is **per container**
+
+---
+
+## 2️⃣ Prototype
+
+```java
+@Component
+@Scope("prototype")
+public class Engine { }
+```
+
+### Meaning:
+
+* New object created **every time it is requested**
+
+### Points:
+
+* Created only when requested (lazy)
+* **Spring does NOT manage destruction**
+
+⚠️ Trap:
+
+> @PreDestroy is NOT called for prototype beans
+
+## 3️⃣ Request (Web Scope)
+
+```java
+@Component
+@Scope("request")
+public class UserRequestBean { }
+```
+
+### Meaning:
+
+* One bean per **HTTP request**
+
+### Points:
+
+* Works only in web applications
+* Automatically destroyed after request ends
+
+## 4️⃣ Session (Web Scope)
+
+```java
+@Component
+@Scope("session")
+public class UserSessionBean { }
+```
+
+### Meaning:
+
+* One bean per **HTTP session**
+
+### Points:
+
+* Same bean reused for one user session
+* Destroyed when session expires
+
+## 5️⃣ Application (Web Scope)
+
+```java
+@Component
+@Scope("application")
+public class AppBean { }
+```
+
+### Meaning:
+
+* One bean per **ServletContext**
+* Shared across whole application
+
+## 6️⃣ WebSocket (Rare)
+
+```java
+@Scope("websocket")
+```
+
+* One bean per WebSocket session
+* Rarely asked
+
+## 🧠 Easy Memory Table
+
+| Scope       | Instance Created     |
+| ----------- | -------------------- |
+| singleton   | One per container    |
+| prototype   | New per request      |
+| request     | One per HTTP request |
+| session     | One per HTTP session |
+| application | One per app          |
+
+## ❓ Spring Boot Impact
+
+❌ Spring Boot does **NOT** change scopes
+✔️ Same scopes apply in Spring Boot
+
+## 🎯 Interview One-Line Answer
+
+> **Bean scope defines the lifecycle and visibility of a bean. The default scope is singleton, and Spring also supports prototype, request, session, and application scopes.**
+
+## ⚠️ Common Interview Traps
+
+* Singleton is **not** per JVM
+* Prototype beans are **not destroyed** by Spring
+* Request/session scopes work **only in web apps**
+
+## 🧠 One-Line Memory Trick
+
+```
+Single → One
+Proto → Many
+Request → One HTTP
+Session → One User
+```
 
 ---
 
