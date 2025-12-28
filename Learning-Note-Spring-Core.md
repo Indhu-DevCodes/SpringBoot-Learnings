@@ -1,6 +1,6 @@
 # Spring - Dependency Injection
 
-## First: What is a “dependency”? 
+### First: What is a “dependency”? 
 
 A **dependency** is **something a class needs to work**.
 
@@ -13,7 +13,7 @@ Example:
 So,
 👉 *Engine is a dependency of Car*
 
-## Now: What is “Dependency Injection”?
+### Now: What is “Dependency Injection”?
 
 **Dependency Injection = Giving what is needed from outside**
 
@@ -27,7 +27,7 @@ We say:
 
 That **someone else** is **Spring**.
 
-## ❌ Life WITHOUT Dependency Injection (Normal Java)
+### ❌ Life WITHOUT Dependency Injection (Normal Java)
 
 ```java
 class Car {
@@ -48,7 +48,7 @@ class Car {
 
 💡 *Car should only DRIVE, not CREATE engines*
 
-## ✅ Life WITH Dependency Injection (Spring Way)
+### ✅ Life WITH Dependency Injection (Spring Way)
 
 ```java
 class Car {
@@ -68,7 +68,7 @@ class Car {
 
 👉 This is **Dependency Injection**
 
-## 🔁 What Spring Boot Actually Does
+### 🔁 What Spring Boot Actually Does
 
 Spring Boot:
 
@@ -87,7 +87,7 @@ Spring says:
 
 > “Okay, I’ll give you an Engine”
 
-## ❓ Why is this IMPORTANT?
+### ❓ Why is this IMPORTANT?
 
 ### 1️⃣ One Job Per Class
 
@@ -123,7 +123,7 @@ new Engine();
 
 Spring handles it 💚
 
-## 🧠 Key Sentence (Remember This)
+### 🧠 Key Sentence (Remember This)
 
 > **Dependency Injection means a class does not create what it needs; it receives it.**
 
@@ -131,7 +131,7 @@ OR even simpler:
 
 > **“Don’t make it, take it.”**
 
-## ⚡ Tiny Example (Complete Flow)
+### ⚡ Tiny Example (Complete Flow)
 
 ```java
 @Component
@@ -406,7 +406,7 @@ You:
 
 #  DI Type to Use - senario
 
-## 1️⃣ What is SETTER Injection? (Reminder)
+### 1️⃣ What is SETTER Injection? (Reminder)
 
 ```java
 @Component
@@ -425,9 +425,9 @@ Plain meaning:
 
 > “Create the object first, then give the dependency later.”
 
-## 2️⃣ FIELD vs SETTER vs CONSTRUCTOR (Big Picture)
+### 2️⃣ FIELD vs SETTER vs CONSTRUCTOR (Big Picture)
 
-## 🔴 1. Visibility of dependency (MOST IMPORTANT)
+### 🔴 1. Visibility of dependency (MOST IMPORTANT)
 
 ### Field Injection ❌
 
@@ -470,7 +470,7 @@ Car(Engine engine) { }
 
 Best ✅
 
-## 🔴 2. Object safety (null problem)
+### 🔴 2. Object safety (null problem)
 
 ### Field Injection ❌
 
@@ -491,7 +491,7 @@ Still risky
 * Object cannot exist without Engine
 * No null state
 
-## 🔴 3. Testing without Spring
+### 🔴 3. Testing without Spring
 
 ### Field Injection ❌
 
@@ -520,7 +520,7 @@ Easy & clean:
 Car car = new Car(new Engine());
 ```
 
-## 🔴 4. Immutability (simple explanation)
+### 🔴 4. Immutability (simple explanation)
 
 ### Field Injection ❌
 
@@ -537,7 +537,7 @@ Car car = new Car(new Engine());
 * `final` possible
 * Object is fixed after creation
 
-## 🔴 5. Design intention
+### 🔴 5. Design intention
 
 | Injection Type | Meaning               |
 | -------------- | --------------------- |
@@ -545,7 +545,7 @@ Car car = new Car(new Engine());
 | Setter         | “Optional dependency” |
 | Constructor    | “Required dependency” |
 
-## 🧠 Real-life analogy 🚗
+### 🧠 Real-life analogy 🚗
 
 ### Field Injection
 
@@ -562,7 +562,7 @@ You *may* add engine later ⚠️
 You get a complete car
 Engine already installed ✅
 
-## 🧠 Final comparison table (Very clear)
+### 🧠 Final comparison table (Very clear)
 
 | Aspect                       | Field | Setter | Constructor |
 | ---------------------------- | ----- | ------ | ----------- |
@@ -572,19 +572,19 @@ Engine already installed ✅
 | Can mark dependency required | ❌     | ❌      | ✅           |
 | Recommended                  | ❌     | ⚠️     | ✅           |
 
-## 🧠 Simple rules to remember
+### 🧠 Simple rules to remember
 
 1️⃣ **Required dependency → Constructor Injection**
 2️⃣ **Optional dependency → Setter Injection**
 3️⃣ **Avoid Field Injection**
 
-## 🧠 One-line memory sentence
+### 🧠 One-line memory sentence
 
 > **Constructor = required, Setter = optional, Field = hidden.**
 
 ### Inversion of Control
 
-## 🧠 What is IoC? (Inversion of Control)
+### 🧠 What is IoC? (Inversion of Control)
 
 ### Meaning in plain words:
 
@@ -619,7 +619,7 @@ You **don’t control** these things anymore.
 
 That is **IoC**.
 
-## In Spring Boot terms (still simple)
+### In Spring Boot terms (still simple)
 
 ### ❌ Without IoC
 
@@ -649,7 +649,7 @@ Spring **gets control**.
 
 👉 This is **Inversion of Control**
 
-## 🧠 Now: What is DI? (Dependency Injection)
+### 🧠 Now: What is DI? (Dependency Injection)
 
 ### Plain meaning:
 
@@ -662,11 +662,11 @@ DI is just a **method** used to achieve IoC.
 * **IoC = What**
 * **DI = How**
 
-## 🎯 Example to connect both
+### 🎯 Example to connect both
 
 ### You need a pen ✍️
 
-#### ❌ Without IoC
+### ❌ Without IoC
 
 You:
 
@@ -676,7 +676,7 @@ You:
 
 You control everything.
 
-#### ✅ With IoC
+### ✅ With IoC
 
 Office:
 
@@ -688,7 +688,7 @@ You didn’t get it yourself.
 
 👉 Pen is given to you (**DI**)
 
-## 🧩 Spring Boot Example (No complexity)
+### 🧩 Spring Boot Example (No complexity)
 
 ```java
 @Component
@@ -707,7 +707,7 @@ What happens?
 * Spring creates Engine (**IoC**)
 * Spring gives Engine to Car (**DI**)
 
-## 🧠 One-line Memory Trick
+### 🧠 One-line Memory Trick
 
 ### 🔹 IoC:
 
@@ -725,7 +725,7 @@ What happens?
 | **DI**       | Spring gives required objects to your class   |
 | **Relation** | DI is one way to implement IoC                |
 
-## Final sentence (remember forever ❤️)
+### Final sentence (remember forever ❤️)
 
 > **IoC is the idea. DI is the action.**
 
@@ -733,14 +733,14 @@ What happens?
 
 # How the Object creation happends inside Ioc 
 
-## First: Important Truth 🌱
+### First: Important Truth 🌱
 
 👉 **You do NOT “create IoC” manually in Spring Boot**
 
 **Spring Boot already has IoC built-in.**
 You just **USE it correctly**.
 
-## 🧠 So what does “create IoC” really mean?
+### 🧠 So what does “create IoC” really mean?
 
 It means:
 
@@ -748,7 +748,7 @@ It means:
 
 That’s it.
 
-## ❌ Wrong way (No IoC)
+### ❌ Wrong way (No IoC)
 
 ```java
 class Car {
@@ -763,11 +763,11 @@ Here:
 
 ❌ No IoC
 
-## ✅ Correct way (IoC in Spring Boot)
+### ✅ Correct way (IoC in Spring Boot)
 
 You do **3 simple things**:
 
-## ✅ STEP 1: Tell Spring “This is an object I want you to manage”
+### ✅ STEP 1: Tell Spring “This is an object I want you to manage”
 
 Use `@Component`
 
@@ -787,7 +787,7 @@ This means:
 
 > “Spring, please create and manage this class”
 
-## ✅ STEP 2: Remove `new` keyword
+### ✅ STEP 2: Remove `new` keyword
 
 ❌ Don’t do this:
 
@@ -795,7 +795,7 @@ This means:
 new Engine();
 ```
 
-## ✅ STEP 3: Ask Spring to give dependency (DI)
+### ✅ STEP 3: Ask Spring to give dependency (DI)
 
 ```java
 @Component
@@ -808,7 +808,7 @@ class Car {
 
 That’s it 🎉
 
-## 🔄 What Spring Boot does internally (Simple Flow)
+### 🔄 What Spring Boot does internally (Simple Flow)
 
 1. Spring starts
 2. Finds `@Component` classes
@@ -818,7 +818,7 @@ That’s it 🎉
 
 👉 **Spring is in control = IoC**
 
-## 🧠 Spring Container (Very Simple Idea)
+### 🧠 Spring Container (Very Simple Idea)
 
 Think of Spring container as a **big box 📦**
 
@@ -834,7 +834,7 @@ When Car says:
 
 Spring takes Engine from box and puts it inside Car.
 
-## 🧩 Minimal Example (Full)
+### 🧩 Minimal Example (Full)
 
 ```java
 @SpringBootApplication
@@ -863,11 +863,11 @@ class Car {
 👉 You did NOTHING extra.
 👉 IoC is already working.
 
-## 🧠 One sentence to remember
+### 🧠 One sentence to remember
 
 > **IoC is created when you stop using `new` and let Spring manage objects.**
 
-## ⚡ Alternative way (Using `@Bean`)
+### ⚡ Alternative way (Using `@Bean`)
 
 ```java
 @Configuration
@@ -882,7 +882,7 @@ class Config {
 
 Spring controls it → IoC ✔
 
-## 🧠 Final Super-Simple Summary
+### 🧠 Final Super-Simple Summary
 
 | What you do      | Result                    |
 | ---------------- | ------------------------- |
@@ -935,7 +935,7 @@ SpringApplication.run(MyApplication.class, args);
 🧠 **Remember:**
 Boot → `SpringApplication.run()`
 
-## 🎯 Interview Answer (Perfect)
+### 🎯 Interview Answer (Perfect)
 
 > **There are 3 ways to create an IoC container:
 
@@ -944,7 +944,7 @@ Boot → `SpringApplication.run()`
 3. Spring Boot, where the container is auto-created using SpringApplication.run().**
 
 
-## 🧠 Super Easy Memory Trick
+### 🧠 Super Easy Memory Trick
 
 ```
 XML   → XML Context
@@ -952,7 +952,7 @@ JAVA  → Annotation Context
 BOOT  → Auto Context
 ```
 
-## ⚠️ Interview Note (Important!)
+### ⚠️ Interview Note (Important!)
 
 Strictly speaking:
 
@@ -968,16 +968,16 @@ Strictly speaking:
 
 # @Bean Vs @Component
 
-## First: What do both do?
+### First: What do both do?
 
 👉 **Both `@Component` and `@Bean` create objects that Spring controls.**
 That’s the only common point.
 
-## 🧠 Think of Spring as a **factory 🏭**
+### 🧠 Think of Spring as a **factory 🏭**
 
 Spring factory makes objects and keeps them ready.
 
-## 1️⃣ `@Component` (Spring finds it by itself)
+### 1️⃣ `@Component` (Spring finds it by itself)
 
 ### Plain meaning:
 
@@ -1005,7 +1005,7 @@ What happens?
 * Class **must be yours**
 * You control the source code
 
-## 2️⃣ `@Bean` (You tell Spring how to create it)
+### 2️⃣ `@Bean` (You tell Spring how to create it)
 
 ### Plain meaning:
 
@@ -1032,7 +1032,7 @@ What happens?
 
 👉 You **manually explain** how to create it
 
-## 🧠 Real-Life Analogy (Very Easy)
+### 🧠 Real-Life Analogy (Very Easy)
 
 ### `@Component`
 
@@ -1050,7 +1050,7 @@ You say:
 
 Spring follows **your instructions** 🍛
 
-## 🧩 When do we use each?
+### 🧩 When do we use each?
 
 ### Use `@Component` when:
 
@@ -1074,7 +1074,7 @@ Example:
 * `ObjectMapper`
 * `RestTemplate`
 
-## 🧠 Why external classes need `@Bean`?
+### 🧠 Why external classes need `@Bean`?
 
 Because you **cannot edit their source code** to add `@Component`.
 
@@ -1087,7 +1087,7 @@ ObjectMapper objectMapper() {
 }
 ```
 
-## 🧠 Key Difference in One Line
+### 🧠 Key Difference in One Line
 
 | Thing               | `@Component`   | `@Bean`              |
 | ------------------- | -------------- | -------------------- |
@@ -1097,7 +1097,7 @@ ObjectMapper objectMapper() {
 | External classes    | ❌ No           | ✅ Yes                |
 | Simplicity          | Very simple    | Slightly manual      |
 
-## 🧠 Memory Trick 🧠
+### 🧠 Memory Trick 🧠
 
 ### 👉 `@Component`
 
@@ -1107,12 +1107,12 @@ ObjectMapper objectMapper() {
 
 **“Spring, do it THIS way.”**
 
-## 🧠 Final simple sentence
+### 🧠 Final simple sentence
 
 > Use `@Component` when you own the class.
 > Use `@Bean` when you don’t own the class or need control.
 
-## 🌱 Simple mental model
+### 🌱 Simple mental model
 
 * `@Component` / `@Bean` → **Create bean**
 * `@Autowired` → **Use bean**
@@ -1123,7 +1123,7 @@ Creation **must happen first**.
 
 # @Bean with DI & why external classes inside @Bean?
 
-## ❓ Can we use **external classes** with **DI**?
+### ❓ Can we use **external classes** with **DI**?
 
 ### ✅ **YES, absolutely**
 
@@ -1138,12 +1138,12 @@ Examples:
 
 👉 DI works **the same** for external classes and our classes.
 
-## ❓ Then why do we need `new` keyword at all?
+### ❓ Then why do we need `new` keyword at all?
 
 This is the **core confusion**.
 Let’s clear it carefully.
 
-## 🧠 Two different worlds
+### 🧠 Two different worlds
 
 ### 🌍 World 1: Normal Java (no Spring)
 
@@ -1174,7 +1174,7 @@ Why no `new`?
 
 👉 Using `new` would **break IoC**
 
-## 🧩 So how does Spring create external objects?
+### 🧩 So how does Spring create external objects?
 
 Using **`@Bean`** or **auto-configuration**.
 
@@ -1196,11 +1196,11 @@ Important:
 * `new` is used **only inside config**
 * NOT inside business classes
 
-## why does it sometimes NOT work?”
+### why does it sometimes NOT work?”
 
 > “If I write `@Autowired ObjectMapper mapper;`
 
-## 🔴 IMPORTANT TRUTH (This is the key)
+### 🔴 IMPORTANT TRUTH (This is the key)
 
 👉 **`@Autowired` works ONLY if Spring already has an object (bean).**
 
@@ -1209,7 +1209,7 @@ If Spring **did NOT create** `ObjectMapper`, then:
 ❌ Spring has nothing to inject
 ❌ `@Autowired` fails
 
-## ❓ Why Spring does NOT always create ObjectMapper?
+### ❓ Why Spring does NOT always create ObjectMapper?
 
 Because:
 
@@ -1217,7 +1217,7 @@ Because:
 * Spring creates **only beans**
 * External classes are **NOT beans by default**
 
-## ❌ What you wrote (why it doesn’t work)
+### ❌ What you wrote (why it doesn’t work)
 
 ```java
 @Autowired
@@ -1237,7 +1237,7 @@ Spring replies:
 
 ---
 
-## 🧠 Why Spring has no ObjectMapper?
+### 🧠 Why Spring has no ObjectMapper?
 
 Because you did NOT tell Spring:
 
@@ -1246,7 +1246,7 @@ Because you did NOT tell Spring:
 
 So Spring never used `new ObjectMapper()`.
 
-## ✅ When does `@Autowired ObjectMapper` WORK?
+### ✅ When does `@Autowired ObjectMapper` WORK?
 
 ### Case 1: You define it using `@Bean`
 
@@ -1279,7 +1279,7 @@ Example:
 
 So this works **only if auto-config is enabled**.
 
-## 🧠 So where is `new` actually used?
+### 🧠 So where is `new` actually used?
 
 ### ✔ Correct place
 
@@ -1298,7 +1298,7 @@ class Service {
 }
 ```
 
-## 🔄 Why using `new` in service breaks IoC?
+### 🔄 Why using `new` in service breaks IoC?
 
 Because:
 
@@ -1309,7 +1309,7 @@ Because:
 
 Spring is **out of control** ❌
 
-## 🧠 Why `new` is forbidden in business classes?
+### 🧠 Why `new` is forbidden in business classes?
 
 Because:
 
@@ -1335,7 +1335,7 @@ class Service {
 }
 ```
 
-## 🧠 Who should use `new`?
+### 🧠 Who should use `new`?
 
 ### Only ONE place:
 
@@ -1347,7 +1347,7 @@ Never in:
 * Controllers
 * Repositories
 
-## 🧠 Real-life analogy (Very clear)
+### 🧠 Real-life analogy (Very clear)
 
 ### ❌ Using `new`
 
@@ -1362,7 +1362,7 @@ Office provides lunch 🍱
 * Kitchen (configuration)
 * NOT by employees (services)
 
-## 🧠 Final Simple Rules (Remember these)
+### 🧠 Final Simple Rules (Remember these)
 
 ### Rule 1
 
@@ -1376,7 +1376,7 @@ Office provides lunch 🍱
 
 > **`new` belongs only in `@Configuration`**
 
-## 🧠 Tiny Full Example
+### 🧠 Tiny Full Example
 
 ```java
 @Configuration
@@ -1398,17 +1398,17 @@ class MyService {
 }
 ```
 
-## 🧠 One-line answer (Plain words)
+### 🧠 One-line answer (Plain words)
 
 > Yes, we can use external classes with DI. We avoid using `new` in our classes because Spring creates and injects the object for us. The `new` keyword is used only inside configuration so Spring stays in control.
 
-## 🧠 Simple Rule (Very Important)
+### 🧠 Simple Rule (Very Important)
 
 > **`@Autowired` does not create objects. It only asks for existing ones.**
 
 > `@Autowired` fails because Spring never created the object in the first place.
 
-## 🧠 Final clarity (Keep this in mind forever)
+### 🧠 Final clarity (Keep this in mind forever)
 
 | Situation                  | Result             |
 | -------------------------- | ------------------ |
@@ -1426,11 +1426,11 @@ class MyService {
 
 Spring does **NOT** automatically manage every class you write.
 
-## 🧠 Simple rule (remember this)
+### 🧠 Simple rule (remember this)
 
 > **A class becomes a Spring bean ONLY if Spring knows about it.**
 
-## ❌ Normal Java class (NOT a bean)
+### ❌ Normal Java class (NOT a bean)
 
 ```java
 class StudentService {
@@ -1443,11 +1443,11 @@ This is just:
 * Spring ignores it
 * You cannot `@Autowired` it
 
-## ✅ How does a class become a bean?
+### ✅ How does a class become a bean?
 
 You must **explicitly tell Spring**.
 
-## 🟢 Method 1: `@Component` (Most common)
+### 🟢 Method 1: `@Component` (Most common)
 
 ```java
 @Component
@@ -1463,7 +1463,7 @@ Now:
 
 ✔ It is a bean
 
-## 🟢 Method 2: Stereotype annotations
+### 🟢 Method 2: Stereotype annotations
 
 These are also `@Component` internally:
 
@@ -1484,7 +1484,7 @@ class StudentService {
 
 ✔ Bean created
 
-## 🟢 Method 3: `@Bean`
+### 🟢 Method 3: `@Bean`
 
 ```java
 @Configuration
@@ -1499,7 +1499,7 @@ class AppConfig {
 
 ✔ Bean created
 
-## ❓ Why do we need to “create” beans?
+### ❓ Why do we need to “create” beans?
 
 Because:
 
@@ -1509,7 +1509,7 @@ Because:
 
 So **you decide**.
 
-## 🧠 Important clarification (Common confusion)
+### 🧠 Important clarification (Common confusion)
 
 ### ❌ This will NOT work
 
@@ -1533,7 +1533,7 @@ class StudentService {
 StudentService service;
 ```
 
-## 🧠 Real-life analogy
+### 🧠 Real-life analogy
 
 ### Your house 🏠
 
@@ -1545,11 +1545,11 @@ Spring container:
 
 Annotations = ID cards 🪪
 
-## 🧠 One-line answer
+### 🧠 One-line answer
 
 > Our Java classes are NOT beans by default. A class becomes a bean only when we annotate it or define it using `@Bean`.
 
-## 🧠 Final summary (very clear)
+### 🧠 Final summary (very clear)
 
 | Class type       | Is it a bean? |
 | ---------------- | ------------- |
@@ -1559,7 +1559,7 @@ Annotations = ID cards 🪪
 | `@Repository`    | ✅ Yes         |
 | `@Bean` method   | ✅ Yes         |
 
-## Stereotype Annotations
+### Stereotype Annotations
 
 ### ✅ What is **Annotation-Based Configuration** (Stereotype Annotations)?
 
@@ -1569,13 +1569,13 @@ Annotations = ID cards 🪪
 
 ---
 
-## 🔹 What are **Stereotype Annotations**?
+### 🔹 What are **Stereotype Annotations**?
 
 Stereotype annotations tell Spring:
 
 > **“This class is a Spring bean — manage it in the IoC container.”**
 
-## ⭐ Main Stereotype Annotations (MOST IMPORTANT)
+### ⭐ Main Stereotype Annotations (MOST IMPORTANT)
 
 ### 1️⃣ `@Component`
 
@@ -1636,7 +1636,7 @@ public class UserRestController {
 @Controller + @ResponseBody
 ```
 
-## 🔁 How Spring Finds These Beans?
+### 🔁 How Spring Finds These Beans?
 
 Using **component scanning** 👇
 
@@ -1652,13 +1652,13 @@ or in Spring Boot:
 
 (Already includes component scanning ✅)
 
-## 🎯 One-Line Interview Answer
+### 🎯 One-Line Interview Answer
 
 > **Annotation-based configuration uses stereotype annotations like @Component, @Service, @Repository, and @Controller to define Spring beans without XML.**
 
 ---
 
-## 🧠 Easy Memory Trick
+### 🧠 Easy Memory Trick
 
 ```
 Component  → General
