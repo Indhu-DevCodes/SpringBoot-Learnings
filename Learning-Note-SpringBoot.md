@@ -1,4 +1,4 @@
-# Spring & Spring Boot Interview Questions
+<img width="828" height="2268" alt="image" src="https://github.com/user-attachments/assets/947d81c8-0f2a-4087-a6cc-b3362eb8cfa4" /># Spring & Spring Boot Interview Questions
 
 ## 1. Core Spring Fundamentals
 1. [What is Spring Framework?](#sb_001)
@@ -2859,24 +2859,19 @@
 ---
 
 
-
-# Question Headings
-
-
-
 ## 1. Core Spring Fundamentals
 
-
+---
 
 <h3 id="sb_001">What is Spring Framework?</h3>
 Spring Framework is a lightweight Java-based framework used to build enterprise applications. Its core principle is Inversion of Control(Ioc), where the Spring container creates and manages application objects called beans and injects their dependencies instead of the application creating objects manually. It also provides support for AOP, transaction management, web applications, security integration, data access, which help us build loosely coupled and maintainable applications.
 
-
+---
 
 <h3 id="sb_002">Why was Spring introduced?</h3>
 Spring was introduced to overcome the complexity of traditional Java enterprise development, especially the heavy infrastructure and tight coupling common in older J2EE applications.It provides IoC and Dependency Injection so that object creation and dependency management are handled by the Spring container. This makes applications more loosely coupled, testable, maintainable, and easier to extend.
 
-Mainly to provide:
+### Mainly to provide:
 
 Loose coupling through Dependency Injection
 IoC for object creation and lifecycle management
@@ -2886,6 +2881,8 @@ Declarative transaction management
 AOP for cross-cutting concerns
 Easier database and web application development
 Better modularity and maintainability
+
+---
 
 <h3 id="sb_003">What problems does Spring solve?</h3>
 
@@ -3234,7 +3231,7 @@ So developers can focus more on **business logic** rather than object-management
 
 ---
 
-# 🧠 Quick Revision Table
+## 🧠 Quick Revision Table
 
 | Problem | Spring Solution |
 |---|---|
@@ -3246,8 +3243,6 @@ So developers can focus more on **business logic** rather than object-management
 | 🗄️ Database boilerplate | Spring Data |
 | ⚙️ Object lifecycle | Spring Container |
 
----
-
 
 ### 🎤 Interview-Ready Answer
 
@@ -3257,15 +3252,42 @@ So developers can focus more on **business logic** rather than object-management
 
 ---
 
-<h3 id="sb_004">What is IoC (Inversion of Control)?</h3>
+<h2 id="sb_004">What is IoC (Inversion of Control)?</h2>
 
 **IoC stands for Inversion of Control.**
 
 IoC is a design principle where the **control of creating objects, configuring them, managing their lifecycle, and providing their dependencies is transferred from the application code to the Spring Container**.
 
+    ✅ IOC is a principle (concept).
+    ✅ Spring Container is the mechanism/tool that implements IOC.
+    
+Think of it like:
+
+    IOC = Idea/Principle
+    Spring Container = Actual implementation of that idea
+
+IOC -> Says:
+"Application code should not create and manage objects. Let a container do it."
+This is just a concept.
+
+Spring Container -> Actually does the work:
+Creates beans
+Injects dependencies
+Manages lifecycle
+Destroys beans
+
+Example:
+When application starts:
+Spring Container scans class.
+Creates bean.
+Stores bean in IOC Container.
+Injects wherever needed.
+
 In simple terms:
 
 > 💡 Instead of our application creating dependent objects using `new`, we let Spring create and manage those objects and provide them wherever they are required.
+> IOC (Inversion of Control) is a design principle where the responsibility of object creation and dependency management is transferred from application code to the Spring Container.
+> Spring Container is the core component of Spring Framework that implements IOC by creating, managing, and injecting beans throughout the application lifecycle.
 
 ---
 
@@ -3283,28 +3305,6 @@ public class OrderService {
     }
 }
 ```
-
-Here:
-
-```text
-OrderService
-     |
-     | creates using new
-     ↓
-PaymentService
-```
-
-`OrderService` itself controls:
-
-```text
-Which object should be created?
-How should it be created?
-When should it be created?
-```
-
-The control is inside our application code.
-
-### Problem
 
 `OrderService` is directly responsible for creating its dependency:
 
@@ -3332,7 +3332,7 @@ the dependent code may need to change.
 
 ---
 
-# ✅ With Spring IoC
+### ✅ With Spring IoC
 
 Using Spring:
 
@@ -3372,13 +3372,9 @@ public class OrderService {
 
 Notice something important.
 
-There is no:
-
-```java
+There is no ```java 
 new UPIPaymentService();
-```
-
-inside `OrderService`.
+``` inside `OrderService`.
 
 Instead:
 
@@ -3398,9 +3394,7 @@ Spring takes responsibility for creating and connecting the objects.
 
 ---
 
-# 🔄 Why is it called "Inversion of Control"?
-
-This is the most important part.
+### 🔄 Why is it called "Inversion of Control"?
 
 Normally:
 
@@ -3448,11 +3442,9 @@ Spring decides how to provide the required bean.
 
 That inversion of responsibility is called:
 
-# 🔥 Inversion of Control
+### 🔥 Inversion of Control
 
----
-
-# 🏗️ What does the Spring IoC Container manage?
+### 🏗️ What does the Spring IoC Container manage?
 
 The Spring Container is responsible for:
 
@@ -3487,10 +3479,94 @@ Performs Initialization
 Beans Ready
 ```
 
----
+### How does Spring Container create and inject beans?
 
-# 🧩 IoC Container in Spring
+When the application starts, the Spring Container performs component scanning and identifies classes annotated with stereotypes like @Component, @Service, @Repository, and @Controller. It creates bean instances, stores them in the IOC container, and whenever it finds a dependency marked with @Autowired, it resolves the matching bean and injects it into the target class.
 
+### How exactly does Spring create the bean? Using constructor? Reflection? JVM magic?
+Spring uses Java Reflection API to create and manage beans.
+
+### What is Reflection in Java?
+Reflection is a Java API that allows a program to inspect and manipulate classes, methods, fields, constructors, and annotations at runtime.
+
+Normally:
+
+```java
+EmployeeService service = new EmployeeService();
+```
+
+You know the class at compile time.
+
+With Reflection:
+
+```java
+Class<?> clazz = Class.forName("EmployeeService");
+Object obj = clazz.getDeclaredConstructor().newInstance();
+```
+
+Java creates the object dynamically at runtime.
+
+### Why does Spring use Reflection?
+Spring uses Reflection to discover annotated classes, create bean objects dynamically, inject dependencies, and manage the bean lifecycle at runtime.
+
+Suppose Spring finds:
+
+```java
+@Service
+public class EmployeeService {
+}
+```
+
+Spring scans the class and says:
+"I found a class marked with @Service. Let me create an object."
+Internally it uses Reflection to:
+> Discover the class
+> Create the object
+> Read annotations (@Service, @Autowired, etc.)
+> Inject dependencies
+
+Simple Example
+
+Class:
+
+```java
+public class Employee {
+ 
+public void display() {
+System.out.println("Hello");
+}
+}
+```
+
+Using Reflection:
+
+```java
+Class<?> clazz = Employee.class;
+ 
+Object obj = clazz.getDeclaredConstructor().newInstance();
+
+Method method = clazz.getMethod("display");
+ 
+method.invoke(obj);
+```
+
+Output:
+
+```text
+Hello
+```
+
+Notice:
+
+```java
+new Employee()
+```
+was never written.
+Reflection created it dynamically.
+
+### 🧩 What Exists Inside Spring Container?
+The two major implementations are: 
+or
 Two important Spring container APIs are:
 
 ```text
@@ -3512,19 +3588,23 @@ Dependency resolution
 Bean lifecycle
 ```
 
+Features:
+Lazy initialization
+Lightweight
+Rarely used nowadays
+
 ### ApplicationContext
 
 `ApplicationContext` builds on `BeanFactory` functionality and is what we normally work with in modern Spring applications.
 
-Later we'll cover:
+Features:
+Most widely used
+AOP support
+Event handling
+Internationalization
+Bean lifecycle management
 
-```text
-BeanFactory
-      vs
-ApplicationContext
-```
-
-in depth.
+Spring Boot uses ApplicationContext internally.
 
 ---
 
@@ -3572,130 +3652,7 @@ The larger concept of Spring controlling object creation and management is **IoC
 
 ---
 
-# 📊 IoC vs DI Quick Comparison
-
-| IoC | Dependency Injection |
-|---|---|
-| Design principle | Technique/pattern used to implement IoC |
-| Broader concept | More specific concept |
-| Transfers control to container/framework | Supplies dependencies from outside |
-| Includes object/lifecycle management concerns | Focuses on dependency provisioning |
-
----
-
-# 🛒 Real-Time Example
-
-Consider an e-commerce application.
-
-```text
-OrderController
-       ↓
-OrderService
-       ↓
-PaymentService
-       ↓
-PaymentGateway
-```
-
-Without IoC, you might manually create everything:
-
-```java
-PaymentGateway gateway = new RazorpayGateway();
-
-PaymentService paymentService =
-        new PaymentService(gateway);
-
-OrderService orderService =
-        new OrderService(paymentService);
-
-OrderController controller =
-        new OrderController(orderService);
-```
-
-Imagine doing this manually for:
-
-```text
-50 Controllers
-100 Services
-80 Repositories
-20 External Clients
-```
-
-It becomes difficult to manage.
-
-With Spring:
-
-```text
-Spring Container
-       |
-       +------> OrderController
-       |
-       +------> OrderService
-       |
-       +------> PaymentService
-       |
-       +------> PaymentGateway
-```
-
-Spring resolves the dependency graph and wires the beans together.
-
----
-
-# 🎯 Important Point
-
-IoC does **not** simply mean:
-
-> "We don't use `new` anywhere."
-
-You can absolutely use `new` in a Spring application.
-
-The important point is:
-
-> **For Spring-managed components, object creation, dependency wiring, configuration, and lifecycle are controlled by the Spring container instead of being manually managed throughout the application.**
-
----
-
-# 🧠 Easy Way to Remember
-
-```text
-Without Spring
-
-Developer
-   ↓
-creates objects
-   ↓
-connects dependencies
-   ↓
-manages lifecycle
-```
-
-```text
-With Spring IoC
-
-Developer
-   ↓
-defines components/configuration
-   ↓
-Spring Container
-   ↓
-creates beans
-   ↓
-injects dependencies
-   ↓
-manages lifecycle
-```
-
-That's the **inversion**.
-
----
-
-> 💡 **Key Point**
->
-> IoC means that responsibility for creating and managing Spring beans is moved from application code to the Spring IoC Container.
-
----
-
-# 🎤 Interview-Ready Answer
+### 🎤 Interview-Ready Answer
 
 > **IoC, or Inversion of Control, is a design principle where the responsibility for creating objects, managing their lifecycle, and resolving their dependencies is transferred from application code to a container or framework.**
 >
@@ -3703,79 +3660,1549 @@ That's the **inversion**.
 
 ---
 
-# ⚡ Short Interview Answer
+<h3 id="sb_005">What is Dependency Injection?</h3>
 
-> **IoC means transferring the control of object creation and dependency management from application code to the Spring Container. Spring creates and manages beans and injects their dependencies, while Dependency Injection is the primary mechanism used to achieve IoC.**
+**Dependency Injection (DI)** is a design pattern where the dependencies required by a class are **provided from outside instead of the class creating those dependencies itself**.
 
----
+In Spring, the **Spring IoC Container creates the required beans and injects them into dependent beans**.
 
-# 🎯 5+ Years Interview Follow-Up Questions
+> 💡 **Simple definition:**  
+> A class should **receive its dependencies** instead of **creating them using `new`**.
 
-Be ready for these:
+Suppose we have:
 
-1. What is the difference between IoC and Dependency Injection?
-2. What is the Spring IoC Container?
-3. `BeanFactory` vs `ApplicationContext`?
-4. How does Spring know which objects to manage?
-5. What exactly is a Spring Bean?
-6. How does Spring create a Bean internally?
-7. How does Spring resolve dependencies?
-8. What happens when two Beans implement the same interface?
-9. How does `@Autowired` work internally?
-10. Can we achieve IoC without Spring?
-11. Can we use `new` inside a Spring application?
-12. How does IoC improve unit testing?
+```java
+public class OrderService {
 
----
+    private PaymentService paymentService;
 
-# 🔥 Important Connection
+}
+```
+
+Here:
 
 ```text
-Spring
-   ↓
-IoC
-   ↓
-Spring Container
-   ↓
-Creates & Manages Beans
-   ↓
-Dependency Injection
-   ↓
-Loose Coupling
-   ↓
-Easier Testing & Maintenance
+OrderService
+     ↓
+needs
+     ↓
+PaymentService
+```
+
+So `PaymentService` is a **dependency of `OrderService`**.
+
+
+# ❌ Without Dependency Injection
+
+```java
+public class OrderService {
+
+    private PaymentService paymentService =
+            new PaymentService();
+
+}
+```
+
+Here `OrderService` creates its own dependency:
+
+```text
+OrderService
+     ↓
+new PaymentService()
+     ↓
+PaymentService
+```
+
+This means:
+
+```text
+OrderService
+      ↓
+knows how PaymentService is created
+      ↓
+stronger coupling
 ```
 
 ---
 
+### ⚠️ What's the problem?
 
-<h3 id="sb_005">What is Dependency Injection?</h3>
+Imagine that later we have:
 
+```java
+public interface PaymentService {
+
+    void pay();
+}
+```
+
+Implementations:
+
+```java
+public class StripePaymentService
+        implements PaymentService {
+}
+```
+
+```java
+public class RazorpayPaymentService
+        implements PaymentService {
+}
+```
+
+If `OrderService` does this:
+
+```java
+private PaymentService paymentService =
+        new StripePaymentService();
+```
+
+then `OrderService` is directly coupled to:
+
+```text
+StripePaymentService
+```
+
+Changing the implementation may require modifying `OrderService`.
+
+---
+
+# ✅ With Dependency Injection
+
+Instead of creating the dependency:
+
+```java
+new StripePaymentService();
+```
+
+we receive it:
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Implementation:
+
+```java
+@Service
+public class StripePaymentService
+        implements PaymentService {
+
+    @Override
+    public void pay() {
+        System.out.println("Payment completed");
+    }
+}
+```
+
+Spring handles the wiring:
+
+```text
+Spring Container
+      ↓
+Creates StripePaymentService
+      ↓
+Creates OrderService
+      ↓
+Injects PaymentService
+      ↓
+OrderService ready
+```
+
+---
+
+### 🏗️ Who performs Dependency Injection in Spring?
+
+**Spring IoC Container**
+
+The container:
+
+```text
+Scans configuration/components
+        ↓
+Finds Bean definitions
+        ↓
+Creates Beans
+        ↓
+Identifies dependencies
+        ↓
+Resolves matching Beans
+        ↓
+Injects dependencies
+        ↓
+Bean ready
+```
+
+### 🎤 Interview-Ready Answer
+
+> **Dependency Injection means providing an object's dependencies from outside instead of allowing the object to create them itself. In Spring, the IoC Container creates and injects the required beans, which helps achieve loose coupling and makes the application easier to test and maintain.**
+
+---
 
 
 <h3 id="sb_006">IoC vs Dependency Injection</h3>
 
+IoC and Dependency Injection are closely related, but they are not the same.
 
+### 🔹 IoC - Inversion of Control
+
+**IoC is a design principle where the control of creating and managing objects is transferred from our application code to the Spring Container.**
+
+Instead of creating objects manually:
+
+```java
+PaymentService paymentService = new PaymentService();
+```
+
+Spring creates and manages the object.
+
+---
+
+### 🔹 Dependency Injection
+
+**Dependency Injection is a technique used to implement IoC, where an object's required dependencies are supplied from outside instead of being created by the object itself.**
+
+Example:
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Here, `OrderService` does not create `PaymentService`.
+
+Spring injects it.
+
+---
+
+### 🔥 Main Difference
+
+| IoC | Dependency Injection |
+|---|---|
+| IoC is a design principle | DI is a technique/pattern |
+| Transfers control to the container | Supplies dependencies to objects |
+| Broader concept | More specific concept |
+| Spring Container implements IoC | Constructor, setter, and field injection are DI approaches |
+
+---
+
+### 🧠 Easy Way to Remember
+
+```text
+IoC
+ ↓
+Who controls object creation?
+ ↓
+Spring Container
+
+
+DI
+ ↓
+How does an object get its dependency?
+ ↓
+Dependency is injected
+```
+
+---
+
+### 🎤 Interview Answer
+
+> **IoC is a broader design principle where control of object creation and management is transferred from the application to the Spring Container. Dependency Injection is a technique used to achieve IoC, where the required dependencies of an object are provided from outside instead of the object creating them itself.**
+
+### Example
+
+```java
+public OrderService(PaymentService paymentService) {
+    this.paymentService = paymentService;
+}
+```
+
+Here:
+
+- Spring creating and managing `OrderService` and `PaymentService` represents **IoC**.
+- Spring providing `PaymentService` to `OrderService` represents **Dependency Injection**.
+
+> **IoC defines who controls object creation and management, while DI defines how dependencies are supplied to those objects.**
+
+---
 
 <h3 id="sb_007">What are the different types of Dependency Injection?</h3>
 
+Spring commonly uses three Dependency Injection styles:
 
+1. **Constructor Injection**
+2. **Setter Injection**
+3. **Field Injection**
+
+The main difference is **how the dependency is provided to the class**.
+
+---
+
+### 1️⃣ Constructor Injection
+
+Constructor Injection means the dependency is provided through the **constructor** when the object is created.
+
+### Example
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Here, `OrderService` requires `PaymentService`.
+
+Spring provides `PaymentService` while creating `OrderService`.
+
+```text
+PaymentService Bean
+        ↓
+        ↓ passed through constructor
+        ↓
+OrderService(PaymentService)
+        ↓
+OrderService ready
+```
+
+### ✅ When should we use Constructor Injection?
+
+Use Constructor Injection when the dependency is **mandatory**.
+
+For example:
+
+```java
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final PaymentService paymentService;
+
+    public OrderService(
+            OrderRepository orderRepository,
+            PaymentService paymentService) {
+
+        this.orderRepository = orderRepository;
+        this.paymentService = paymentService;
+    }
+}
+```
+
+An `OrderService` cannot perform its job without:
+
+- `OrderRepository`
+- `PaymentService`
+
+Therefore, both are required dependencies.
+
+Constructor Injection is the best choice here.
+
+
+### ✅ Advantages of Constructor Injection
+
+### 1. Required dependencies are guaranteed
+
+If `OrderService` needs `PaymentService`, you cannot normally create it without supplying one:
+
+```java
+new OrderService(paymentService);
+```
+
+This prevents creating an incomplete object.
+
+### 2. Supports `final`
+
+```java
+private final PaymentService paymentService;
+```
+
+Once assigned through the constructor, the reference cannot be reassigned.
+
+This makes the dependency relationship clearer.
+
+### 3. Easy to unit test
+
+```java
+PaymentService paymentService =
+        mock(PaymentService.class);
+
+OrderService orderService =
+        new OrderService(paymentService);
+```
+
+We can directly pass a mock without starting Spring.
+
+---
+
+### 4. Dependencies are visible
+
+Looking at:
+
+```java
+public OrderService(
+        OrderRepository orderRepository,
+        PaymentService paymentService) {
+}
+```
+
+we immediately know what `OrderService` depends on.
+
+---
+
+### ❌ Disadvantages of Constructor Injection
+
+### 1. Constructor can become large
+
+```java
+public OrderService(
+    OrderRepository repository,
+    PaymentService paymentService,
+    InventoryService inventoryService,
+    NotificationService notificationService,
+    AuditService auditService,
+    CustomerService customerService) {
+}
+```
+
+But this is often actually a **design warning**.
+
+Too many constructor dependencies may indicate that the class has too many responsibilities and should be refactored.
+
+### ⭐ Recommendation
+
+> **Use Constructor Injection for mandatory dependencies. This should normally be your default choice in Spring application code.**
+
+---
+
+### 2️⃣ Setter Injection
+
+Setter Injection means the dependency is provided using a **setter method** after the object has been created.
+
+### Example
+
+```java
+@Service
+public class NotificationService {
+
+    private AuditService auditService;
+
+    @Autowired
+    public void setAuditService(AuditService auditService) {
+        this.auditService = auditService;
+    }
+}
+```
+
+Conceptually:
+
+```text
+Create NotificationService
+        ↓
+Create/resolve AuditService
+        ↓
+setAuditService(auditService)
+        ↓
+NotificationService ready
+```
+
+### ✅ When should we use Setter Injection?
+
+Setter Injection is useful when a dependency is genuinely **optional or reconfigurable**.
+
+For example, imagine auditing is optional:
+
+```java
+public class NotificationService {
+
+    private AuditService auditService;
+
+    public void setAuditService(AuditService auditService) {
+        this.auditService = auditService;
+    }
+}
+```
+
+The core object can exist without `AuditService`.
+
+```text
+NotificationService
+       ↓
+can work without
+       ↓
+AuditService
+```
+
+In that design, setter injection can communicate that the dependency isn't fundamental to constructing a valid object.
+
+
+### ✅ Advantages of Setter Injection
+
+### 1. Suitable for optional dependencies
+
+The object can be created before the optional dependency is supplied.
+
+### 2. Dependency can be changed
+
+Because there is a setter:
+
+```java
+service.setAuditService(auditService1);
+
+service.setAuditService(auditService2);
+```
+
+the reference can be replaced if the design intentionally requires that behavior.
+
+### 3. Useful in specific configuration scenarios
+
+Setter injection can be appropriate where construction and configuration are intentionally separate stages.
+
+### ❌ Disadvantages of Setter Injection
+
+### 1. Object can exist without its dependency
+
+For a required dependency, this would be dangerous:
+
+```java
+OrderService orderService = new OrderService();
+
+// paymentService may not be set
+```
+
+Therefore, setter injection is usually a poor choice for dependencies that are absolutely required.
+
+### 2. Cannot normally keep the dependency `final`
+
+```java
+private PaymentService paymentService;
+```
+
+A setter assigns it after construction, so this cannot follow the normal constructor-set `final` pattern.
+
+### 3. Dependency can accidentally be changed later
+
+```java
+setPaymentService(otherPaymentService);
+```
+
+If replacement isn't actually a requirement, mutability adds unnecessary risk.
+
+### ⭐ Recommendation
+
+> **Use Setter Injection when the dependency is intentionally optional or needs to remain changeable after object construction.**
+
+
+### 3️⃣ Field Injection
+
+Field Injection means Spring injects the dependency **directly into a field**.
+
+### Example
+
+```java
+@Service
+public class OrderService {
+
+    @Autowired
+    private PaymentService paymentService;
+}
+```
+
+There is:
+
+- No constructor parameter
+- No setter method
+
+Spring injects the field as part of managing the bean.
+
+### ✅ When is Field Injection used?
+
+You will commonly see it in:
+
+- Older Spring applications
+- Legacy codebases
+- Small demos/tutorials
+- Tests or framework-managed contexts where convenience is prioritized
+
+For production service classes, **Constructor Injection is generally a better choice**.
+
+
+### ✅ Advantages of Field Injection
+
+### 1. Less code
+
+```java
+@Autowired
+private PaymentService paymentService;
+```
+
+is concise.
+
+### 2. Easy to read in very small examples
+
+For demos or prototypes it may look simpler.
+
+But less code does not necessarily mean better design.
+
+### ❌ Disadvantages of Field Injection
+
+### 1. Dependencies are hidden
+
+Compare:
+
+```java
+public OrderService(
+        PaymentService paymentService,
+        OrderRepository orderRepository) {
+}
+```
+
+with:
+
+```java
+@Autowired
+private PaymentService paymentService;
+
+@Autowired
+private OrderRepository orderRepository;
+```
+
+With Constructor Injection, the required dependencies are visible directly in the constructor API.
+
+### 2. Harder to unit test directly
+
+Constructor Injection:
+
+```java
+OrderService service =
+        new OrderService(mockPaymentService);
+```
+
+Very simple.
+
+With private Field Injection:
+
+```java
+@Autowired
+private PaymentService paymentService;
+```
+
+the dependency isn't supplied through the class's public construction API.
+
+You may end up depending on Spring test infrastructure, Mockito annotation injection, or reflection instead of simply constructing the object.
+
+### 3. Cannot make the dependency naturally `final`
+
+Field injection typically looks like:
+
+```java
+@Autowired
+private PaymentService paymentService;
+```
+
+instead of:
+
+```java
+private final PaymentService paymentService;
+```
+
+### 4. Can hide too many dependencies
+
+A poorly designed class can quietly accumulate many dependencies:
+
+```java
+@Autowired
+private PaymentService paymentService;
+
+@Autowired
+private OrderRepository repository;
+
+@Autowired
+private InventoryService inventoryService;
+
+@Autowired
+private NotificationService notificationService;
+
+@Autowired
+private AuditService auditService;
+
+@Autowired
+private CustomerService customerService;
+```
+
+The design problem is much easier to notice with a large constructor.
+
+### ⭐ Recommendation
+
+> **Avoid Field Injection for normal production service code. Prefer Constructor Injection for required dependencies.**
+
+# 📊 Constructor vs Setter vs Field Injection
+
+| Feature | Constructor | Setter | Field |
+|---|---|---|---|
+| Required dependency | ✅ Best choice | ⚠️ Possible but not ideal | ⚠️ Possible |
+| Optional dependency | Possible | ✅ Good use case | Possible |
+| Supports `final` naturally | ✅ Yes | ❌ No | ❌ Typically no |
+| Easy unit testing | ✅ Excellent | ✅ Good | ⚠️ Less convenient |
+| Dependencies clearly visible | ✅ Yes | ✅ Reasonably | ❌ Hidden in fields |
+| Object complete after construction | ✅ Yes | ⚠️ Not necessarily | ⚠️ Injection occurs after construction |
+| Recommended for service classes | ✅ Yes | Situation dependent | ❌ Generally avoid |
+
+# 🎤 Interview-Ready Answer
+
+> **Spring commonly uses Constructor, Setter, and Field Injection. Constructor Injection is preferred for mandatory dependencies because it makes dependencies explicit, allows final fields, ensures the object receives its required dependencies during construction, and makes unit testing easier. Setter Injection is appropriate when a dependency is genuinely optional or needs to be changed after object creation. Field Injection is concise, but it is generally avoided in production code because dependencies are hidden, final fields cannot be used naturally, and plain unit testing becomes less convenient.**
+
+---
 
 <h3 id="sb_008">Constructor Injection</h3>
 
 
+**Constructor Injection** is a type of Dependency Injection where the required dependencies of a class are provided through its **constructor when the object is created**.
+
+It is the **preferred approach for mandatory dependencies** in Spring applications.
+
+
+### 🔄 How does it work in Spring?
+
+Spring first identifies that `OrderService` requires a `PaymentService`.
+
+```java
+public OrderService(PaymentService paymentService)
+```
+
+Spring looks for a matching `PaymentService` bean.
+
+Conceptually:
+
+```text
+Spring Container
+      ↓
+Find OrderService
+      ↓
+Inspect Constructor
+      ↓
+Constructor requires PaymentService
+      ↓
+Find PaymentService Bean
+      ↓
+Pass PaymentService to Constructor
+      ↓
+Create OrderService
+```
+
+So conceptually Spring performs something similar to:
+
+```java
+PaymentService paymentService = ...;
+
+OrderService orderService =
+        new OrderService(paymentService);
+```
+
+The important difference is that **Spring manages this process for Spring-managed beans**.
+
+
+### 🧪 Practical Spring Boot Example
+
+Consider:
+
+```java
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final PaymentService paymentService;
+    private final InventoryService inventoryService;
+
+    public OrderService(
+            OrderRepository orderRepository,
+            PaymentService paymentService,
+            InventoryService inventoryService) {
+
+        this.orderRepository = orderRepository;
+        this.paymentService = paymentService;
+        this.inventoryService = inventoryService;
+    }
+
+    public void createOrder(Order order) {
+
+        inventoryService.checkStock(order);
+
+        paymentService.processPayment();
+
+        orderRepository.save(order);
+    }
+}
+```
+
+All three dependencies are required:
+
+```text
+OrderService
+     |
+     +---- OrderRepository
+     |
+     +---- PaymentService
+     |
+     +---- InventoryService
+```
+
+Therefore Constructor Injection is a good design.
+
+### ⚠️ What if Spring cannot find the dependency?
+
+Suppose:
+
+```java
+@Service
+public class OrderService {
+
+    public OrderService(PaymentService paymentService) {
+    }
+}
+```
+
+but there is **no `PaymentService` bean**.
+
+Spring cannot create `OrderService` because its required constructor dependency cannot be satisfied.
+
+The application startup will fail with a dependency resolution error, commonly involving:
+
+```text
+NoSuchBeanDefinitionException
+```
+
+or an `UnsatisfiedDependencyException` that points to the missing bean.
+
+### ⚠️ What if multiple Beans match?
+
+Suppose:
+
+```java
+@Service
+public class StripePaymentService
+        implements PaymentService {
+}
+```
+
+and:
+
+```java
+@Service
+public class RazorpayPaymentService
+        implements PaymentService {
+}
+```
+
+Then:
+
+```java
+public OrderService(PaymentService paymentService) {
+    this.paymentService = paymentService;
+}
+```
+
+Spring may not know which implementation should be injected.
+
+There are two candidates:
+
+```text
+PaymentService
+     |
+     +---- StripePaymentService
+     |
+     +---- RazorpayPaymentService
+```
+
+We can resolve this using mechanisms such as:
+
+```java
+@Qualifier
+```
+
+or:
+
+```java
+@Primary
+```
+
+
+### ⚠️ What if the constructor has too many dependencies?
+
+Example:
+
+```java
+public OrderService(
+        PaymentService paymentService,
+        InventoryService inventoryService,
+        NotificationService notificationService,
+        CustomerService customerService,
+        AuditService auditService,
+        DiscountService discountService,
+        ShippingService shippingService) {
+}
+```
+
+This isn't necessarily a problem with Constructor Injection.
+
+Instead, it can reveal a **design problem**.
+
+The class may have too many responsibilities.
+
+```text
+Large Constructor
+       ↓
+Many Dependencies
+       ↓
+Possible Too Many Responsibilities
+       ↓
+Review Class Design
+```
+
+This is actually an advantage of Constructor Injection because it makes excessive dependencies visible.
+
+### 📊 Key Advantages
+
+| Advantage | Why it matters |
+|---|---|
+| ✅ Mandatory dependency | Object cannot normally be created without required dependencies |
+| ✅ Supports `final` | Dependency reference cannot be reassigned |
+| ✅ Easy testing | Mocks can be passed directly |
+| ✅ Explicit dependencies | Constructor shows exactly what the class needs |
+| ✅ Valid object state | Required dependencies are available after construction |
+| ✅ Design feedback | Too many constructor parameters can expose an oversized class |
+
+### ❌ Main Disadvantage
+
+The main practical disadvantage is that constructors can become large when a class has many dependencies.
+
+```java
+public OrderService(
+    A a,
+    B b,
+    C c,
+    D d,
+    E e,
+    F f) {
+}
+```
+
+But instead of switching to Field Injection just to hide this, we should ask:
+
+> **Does this class have too many responsibilities?**
+
+It may indicate that the class should be split into smaller services.
+
+
+### 🎯 Important Interview Follow-Ups
+
+### Is `@Autowired` mandatory on constructor injection?
+
+**No.** If the Spring bean has only one constructor, Spring can automatically use it for dependency injection.
+If a Spring bean has only one constructor, @Autowired is not required because Spring automatically uses that constructor. If there are multiple constructors, @Autowired can be used to indicate which constructor Spring should use for dependency injection.
+
+### Why use `final`?
+
+```java
+private final PaymentService paymentService;
+```
+
+It communicates that this dependency is required and the reference should not be reassigned after construction.
+
+### What if Spring cannot find the required bean?
+
+The bean cannot be constructed and application-context initialization typically fails with a dependency resolution error.
+
+### What if two implementations exist?
+
+Spring needs a way to select the appropriate candidate, such as `@Qualifier` or `@Primary`.
+
+---
 
 <h3 id="sb_009">Setter Injection</h3>
 
+**Setter Injection** is a type of Dependency Injection where Spring provides a dependency to a class through a **setter method after the object has been created**.
 
+It is mainly useful when a dependency is **optional or intentionally reconfigurable**.
+
+### 🔹 Simple Example
+
+```java
+@Service
+public class OrderService {
+
+    private NotificationService notificationService;
+
+    @Autowired
+    public void setNotificationService(
+            NotificationService notificationService) {
+
+        this.notificationService = notificationService;
+    }
+}
+```
+
+Here, Spring:
+
+```text
+Creates OrderService
+        ↓
+Finds NotificationService Bean
+        ↓
+Calls setNotificationService(...)
+        ↓
+Injects NotificationService
+```
+
+The important difference from Constructor Injection is:
+
+```text
+Constructor Injection
+Dependency provided while object is created
+
+Setter Injection
+Dependency provided after object is created
+```
+
+### ✅ When should we use Setter Injection?
+
+Setter Injection is useful when the dependency is **not essential for creating a valid object**.
+
+For example, suppose `NotificationService` is optional:
+
+```java
+public class OrderService {
+
+    private NotificationService notificationService;
+
+    public void setNotificationService(
+            NotificationService notificationService) {
+
+        this.notificationService = notificationService;
+    }
+}
+```
+
+The main `OrderService` functionality may work without notifications.
+
+```text
+OrderService
+    |
+    +---- OrderRepository      → Required
+    |
+    +---- NotificationService → Optional
+```
+
+A possible design would therefore be:
+
+```java
+@Service
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+
+    private NotificationService notificationService;
+
+    public OrderService(OrderRepository orderRepository) {
+        this.orderRepository = orderRepository;
+    }
+
+    @Autowired
+    public void setNotificationService(
+            NotificationService notificationService) {
+
+        this.notificationService = notificationService;
+    }
+}
+```
+
+Here:
+
+```text
+OrderRepository
+      ↓
+Mandatory
+      ↓
+Constructor Injection
+
+
+NotificationService
+      ↓
+Optional/reconfigurable by design
+      ↓
+Setter Injection
+```
+
+---
+
+### ✅ Advantages of Setter Injection
+
+### 1️⃣ Suitable for Optional Dependencies
+
+The object can be constructed without that dependency.
+
+```java
+OrderService orderService =
+        new OrderService(orderRepository);
+```
+
+The optional dependency can be supplied afterward.
+
+### 2️⃣ Dependency Can Be Changed
+
+Because a setter exists:
+
+```java
+orderService.setNotificationService(emailService);
+```
+
+it could later be replaced:
+
+```java
+orderService.setNotificationService(smsService);
+```
+
+This is useful when the design genuinely requires the dependency to be reconfigured.
+
+### 3️⃣ Clear Separation Between Required and Optional Dependencies
+
+You can use:
+
+```text
+Constructor
+    ↓
+Required Dependencies
+
+Setter
+    ↓
+Optional/Reconfigurable Dependencies
+```
+
+This clearly expresses the intended relationship.
+
+### ❌ Disadvantages of Setter Injection
+
+### 1️⃣ Object Can Exist Without the Dependency
+
+Suppose `PaymentService` is actually mandatory:
+
+```java
+@Service
+public class OrderService {
+
+    private PaymentService paymentService;
+
+    @Autowired
+    public void setPaymentService(
+            PaymentService paymentService) {
+
+        this.paymentService = paymentService;
+    }
+}
+```
+
+From a plain Java design perspective, this is possible:
+
+```java
+OrderService orderService =
+        new OrderService();
+```
+
+Now the object exists before `PaymentService` is supplied.
+
+For a mandatory dependency, Constructor Injection communicates the requirement better.
+
+### 2️⃣ Cannot Naturally Use `final`
+
+This works with Constructor Injection:
+
+```java
+private final PaymentService paymentService;
+```
+
+But normal Setter Injection requires reassignment:
+
+```java
+private PaymentService paymentService;
+```
+
+The field cannot follow the usual constructor-initialized `final` pattern.
+
+---
+
+### 3️⃣ Dependency Can Be Reassigned
+
+Because there is a setter:
+
+```java
+setPaymentService(paymentService1);
+```
+
+someone could later call:
+
+```java
+setPaymentService(paymentService2);
+```
+
+If the dependency is not supposed to change, this creates unnecessary mutability.
+
+### 🎤 Interview-Ready Answer
+
+> **Setter Injection is a type of Dependency Injection where Spring injects a dependency through a setter method after creating the object. I would mainly use Setter Injection when a dependency is optional or intentionally needs to be replaceable after object creation. For mandatory dependencies, I prefer Constructor Injection because it ensures that the object is created with all of its required dependencies.**
+
+---
 
 <h3 id="sb_010">Field Injection</h3>
 
+**Field Injection** is a type of Dependency Injection where Spring injects the required dependency **directly into a class field**, usually by using `@Autowired`.
 
+Unlike Constructor Injection or Setter Injection, we don't provide the dependency through a constructor or setter method.
+
+```text
+Spring creates OrderService
+        ↓
+Finds @Autowired field
+        ↓
+Looks for PaymentService Bean
+        ↓
+Injects PaymentService
+        ↓
+OrderService ready
+```
+
+### ✅ Advantages of Field Injection
+
+### 1️⃣ Less Boilerplate Code
+
+Field Injection is very concise.
+
+```java
+@Autowired
+private PaymentService paymentService;
+```
+
+We don't need to explicitly write:
+
+```java
+public OrderService(PaymentService paymentService) {
+    this.paymentService = paymentService;
+}
+```
+
+This is one reason Field Injection became common in older Spring applications and tutorials.
+
+---
+
+### 2️⃣ Easy to Write for Small Examples
+
+For quick demos and prototypes:
+
+```java
+@Autowired
+private UserRepository userRepository;
+```
+
+is simple and easy to write.
+
+However, convenience alone does not make it the best design for production service classes.
+
+### ❌ Disadvantages of Field Injection
+
+### 1️⃣ Dependencies Are Hidden
+
+Consider:
+
+```java
+@Service
+public class OrderService {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private InventoryService inventoryService;
+}
+```
+
+Looking only at:
+
+```java
+new OrderService();
+```
+
+we cannot tell what dependencies `OrderService` requires.
+
+Compare this with Constructor Injection:
+
+```java
+public OrderService(
+        OrderRepository orderRepository,
+        PaymentService paymentService,
+        InventoryService inventoryService) {
+}
+```
+
+The required dependencies are immediately visible.
+
+```text
+Constructor Injection
+        ↓
+Dependencies are explicit ✅
+
+
+Field Injection
+        ↓
+Dependencies are hidden inside fields ⚠️
+```
+
+### 2️⃣ Harder to Unit Test Without Spring
+
+Suppose:
+
+```java
+public class OrderService {
+
+    @Autowired
+    private PaymentService paymentService;
+}
+```
+
+In a simple unit test:
+
+```java
+OrderService orderService =
+        new OrderService();
+```
+
+there is no constructor parameter through which we can directly provide:
+
+```java
+mockPaymentService
+```
+
+With Constructor Injection:
+
+```java
+PaymentService mockPaymentService =
+        mock(PaymentService.class);
+
+OrderService orderService =
+        new OrderService(mockPaymentService);
+```
+
+Testing becomes straightforward without starting the Spring context.
+
+
+### 3️⃣ Cannot Naturally Use `final`
+
+With Constructor Injection:
+
+```java
+private final PaymentService paymentService;
+```
+
+This is possible because the dependency is assigned during construction.
+
+With normal Field Injection:
+
+```java
+@Autowired
+private PaymentService paymentService;
+```
+
+the dependency is injected after construction, so the standard constructor-initialized `final` design cannot be used.
+
+
+### 4️⃣ Object Can Be Created in an Invalid State Outside Spring
+
+Consider:
+
+```java
+public class OrderService {
+
+    @Autowired
+    private PaymentService paymentService;
+}
+```
+
+Someone can write:
+
+```java
+OrderService orderService =
+        new OrderService();
+```
+
+At this point, outside Spring-managed injection:
+
+```text
+paymentService = null
+```
+
+Calling code that uses it could result in:
+
+```text
+NullPointerException
+```
+
+With Constructor Injection:
+
+```java
+new OrderService(paymentService);
+```
+
+the required dependency must be provided at construction time.
+
+
+### 5️⃣ Can Hide Too Many Dependencies
+
+Field Injection can make it easy to keep adding dependencies:
+
+```java
+@Autowired
+private OrderRepository orderRepository;
+
+@Autowired
+private PaymentService paymentService;
+
+@Autowired
+private InventoryService inventoryService;
+
+@Autowired
+private NotificationService notificationService;
+
+@Autowired
+private AuditService auditService;
+
+@Autowired
+private CustomerService customerService;
+
+@Autowired
+private ShippingService shippingService;
+```
+
+The class may have too many responsibilities, but the problem is less obvious.
+
+With Constructor Injection:
+
+```java
+public OrderService(
+        OrderRepository orderRepository,
+        PaymentService paymentService,
+        InventoryService inventoryService,
+        NotificationService notificationService,
+        AuditService auditService,
+        CustomerService customerService,
+        ShippingService shippingService) {
+}
+```
+
+The large constructor immediately suggests:
+
+```text
+Too many dependencies
+        ↓
+Possible too many responsibilities
+        ↓
+Review the class design
+```
+
+### 🎯 When Should Field Injection Be Used?
+
+For normal Spring Boot business/service code:
+
+> **Prefer Constructor Injection rather than Field Injection.**
+
+Field Injection is still commonly encountered in:
+
+- Legacy Spring applications
+- Older codebases
+- Simple demonstrations/tutorials
+- Some test code or framework-specific situations
+
+But for classes such as:
+
+```text
+OrderService
+PaymentService
+CustomerService
+InventoryService
+```
+
+Constructor Injection is generally the better design.
+
+
+### ⚡ Short Interview Answer
+
+> **Field Injection injects dependencies directly into fields using `@Autowired`. It is concise, but Constructor Injection is generally preferred because it makes dependencies explicit, supports final fields, and makes unit testing easier.**
+
+---
 
 <h3 id="sb_011">Constructor vs Setter vs Field Injection</h3>
 
+The main difference between these three approaches is **when and how the dependency is supplied, and whether that dependency is mandatory or optional**.
 
+### 📊 Comparison
+
+| Point | Constructor Injection | Setter Injection | Field Injection |
+|---|---|---|---|
+| Dependency provided | During object creation | After object creation | Directly into field |
+| Best suited for | Mandatory dependencies | Optional/reconfigurable dependencies | Generally avoided in application code |
+| `final` field support | ✅ Yes | ❌ No | ❌ No |
+| Dependency visibility | ✅ Very clear | ✅ Clear | ⚠️ Less explicit |
+| Unit testing | ✅ Easiest | ✅ Easy | ⚠️ Less convenient |
+| Object complete at construction | ✅ Yes | ⚠️ Not necessarily | ⚠️ Injection occurs later |
+| Recommended approach | ⭐ Preferred | Use when appropriate | Generally avoid |
+
+### 🎯 How Do I Choose?
+
+Use this decision:
+
+```text
+Is the dependency mandatory?
+        ↓
+       YES
+        ↓
+Constructor Injection
+
+
+Is the dependency genuinely optional
+or intentionally reconfigurable?
+        ↓
+       YES
+        ↓
+Setter Injection
+
+
+Field Injection?
+        ↓
+Generally avoid for service/business classes
+```
+
+> **The injection style should represent the dependency relationship. Mandatory dependencies belong naturally in the constructor. Setter Injection can be appropriate for genuinely optional or reconfigurable dependencies. Field Injection is convenient but generally avoided in application service classes because it hides dependencies and makes plain unit testing less convenient.**
+
+---
 
 <h3 id="sb_012">Why is Constructor Injection recommended?</h3>
 
@@ -3783,47 +5210,850 @@ Easier Testing & Maintenance
 
 <h3 id="sb_013">What is a Spring Bean?</h3>
 
+A Spring Bean is an object managed by the Spring IoC Container. The container handles its creation, dependency injection, configuration, scope, and lifecycle.
 
+Example:
+
+```java
+@Service
+public class PaymentService {
+}
+```
+
+Here, PaymentService is registered and managed by Spring, so its instance is a Spring Bean.
+
+### 🔹 How Do We Create Spring Beans?
+
+There are several ways to register objects as Spring Beans.
+
+### 1️⃣ Using Component Annotations
+
+Example:
+
+```java
+@Component
+public class EmailService {
+}
+```
+
+Other specialized component annotations include:
+
+```java
+@Service
+@Repository
+@Controller
+@RestController
+```
+
+For example:
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+Spring discovers these classes during component scanning and registers them as beans.
+
+### 2️⃣ Using `@Bean`
+
+Sometimes we want to explicitly create a bean through configuration.
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public PaymentService paymentService() {
+        return new PaymentService();
+    }
+}
+```
+
+Here:
+
+```java
+@Bean
+```
+
+tells Spring:
+
+> Register the object returned by this method as a Spring Bean.
+
+This is especially useful when configuring objects whose class we don't directly control, such as objects from external libraries.
+
+---
 
 <h3 id="sb_014">Java Object vs Spring Bean</h3>
 
+A Java object is any object created normally using Java, usually with the new keyword. A Spring Bean is a Java object whose creation, configuration, dependencies, and lifecycle are managed by the Spring IoC Container.
 
+### Normal Java Object
+
+```java
+PaymentService paymentService =
+        new PaymentService();
+```
+
+Here, **we created the object manually**.
+
+Spring is not managing this particular instance.
+
+```text
+new PaymentService()
+        ↓
+Normal Java Object
+```
+
+### Spring Bean
+
+```java
+@Service
+public class PaymentService {
+}
+```
+
+Spring creates and manages the instance.
+
+```text
+Spring Container
+      ↓
+Creates PaymentService
+      ↓
+Manages PaymentService
+      ↓
+Spring Bean
+```
+
+Every Spring Bean is a Java object, but every Java object is not a Spring Bean. An object becomes a Spring Bean when it is registered with and managed by the Spring IoC Container.
+
+---
 
 <h3 id="sb_015">What is Spring Container?</h3>
 
+The **Spring IoC Container is the core part of Spring responsible for creating, configuring, managing, and connecting Spring Beans throughout their lifecycle.**
 
+The container reads the application's configuration, identifies the required beans, creates them, resolves their dependencies, and manages them.
+
+### 🔹 Main Responsibilities
+
+The Spring IoC Container handles:
+
+```text
+Read Bean Configuration
+        ↓
+Create Beans
+        ↓
+Resolve Dependencies
+        ↓
+Inject Dependencies
+        ↓
+Initialize Beans
+        ↓
+Manage Bean Scope & Lifecycle
+        ↓
+Destroy Beans when required
+```
+
+### 🔹 Main Types of Spring IoC Container
+
+Spring provides two important container interfaces:
+
+```text
+BeanFactory
+     ↓
+Basic IoC Container
+
+ApplicationContext
+     ↓
+More feature-rich IoC Container
+```
+
+`ApplicationContext` is commonly used in modern Spring applications.
+
+### 🎤 Interview-Ready Answer
+
+> **The Spring IoC Container is responsible for managing Spring Beans. It creates and configures beans, resolves and injects their dependencies, and manages their scope and lifecycle. Spring provides BeanFactory and ApplicationContext as the main container interfaces, with ApplicationContext being commonly used in modern Spring applications.**
+
+### 🧠 Easy to Remember
+
+```text
+Spring IoC Container
+        =
+Create + Configure + Inject + Manage Beans
+```
+
+---
 
 <h3 id="sb_016">What is ApplicationContext?</h3>
 
+`ApplicationContext` is the **main Spring IoC container interface used to manage beans in a Spring application**.
 
+It provides all the basic container capabilities and also supports additional enterprise features such as **events, internationalization, resource loading, and environment/property access**.
+
+### 🔹 What Does ApplicationContext Do?
+
+`ApplicationContext` provides access to:
+
+- Bean creation and management
+- Dependency injection
+- Bean lifecycle
+- Bean scopes
+- Application events
+- Environment and properties
+- Resource loading
+- Internationalization (i18n)
+
+### 🔹 Example
+
+```java
+ApplicationContext context =
+        new AnnotationConfigApplicationContext(AppConfig.class);
+
+PaymentService paymentService =
+        context.getBean(PaymentService.class);
+```
+
+Here:
+
+```text
+ApplicationContext
+       ↓
+Loads configuration
+       ↓
+Creates and manages Beans
+       ↓
+PaymentService Bean
+       ↓
+getBean()
+```
+
+Normally in a Spring Boot application, we don't manually create the `ApplicationContext`.
+
+Spring Boot creates and initializes an appropriate application context during application startup.
+
+---
+
+### 🔹 Common ApplicationContext Implementations
+
+Examples include:
+
+```text
+AnnotationConfigApplicationContext
+        ↓
+Annotation / Java configuration
+
+ClassPathXmlApplicationContext
+        ↓
+XML configuration
+```
+
+Web-based Spring applications use web-aware `ApplicationContext` implementations.
+
+
+### 🎤 Interview-Ready Answer
+
+> **ApplicationContext is Spring's main IoC container interface. It is responsible for accessing and managing Spring beans and provides additional capabilities such as application events, resource loading, environment and property access, and internationalization. In Spring Boot, the ApplicationContext is created automatically during application startup.**
+
+---
 
 <h3 id="sb_017">What is BeanFactory?</h3>
 
+`BeanFactory` is the **basic IoC container interface in Spring**.
 
+It provides the fundamental functionality required to **create, configure, retrieve, and manage Spring Beans and their dependencies**.
+
+
+### 🔹 What does BeanFactory do?
+
+Its main responsibilities include:
+
+- Creating and managing beans
+- Resolving dependencies between beans
+- Providing beans when requested
+- Managing bean scopes
+- Supporting bean lifecycle operations
+
+### 🔹 Simple Example
+
+```java
+BeanFactory beanFactory = context;
+
+PaymentService paymentService =
+        beanFactory.getBean(PaymentService.class);
+```
+
+Here:
+
+```java
+getBean(PaymentService.class)
+```
+
+asks the `BeanFactory` for the `PaymentService` bean.
+
+### 🔹 Where is BeanFactory used?
+
+In normal Spring Boot application development, we usually work with:
+
+```text
+ApplicationContext
+```
+
+rather than directly using:
+
+```text
+BeanFactory
+```
+
+because `ApplicationContext` extends the basic container capabilities and provides additional application-level features.
+
+### 🔥 Important Interview Point
+
+`BeanFactory` is the **foundation of Spring's bean-management infrastructure**.
+
+Conceptually:
+
+```text
+BeanFactory
+     ↓
+Basic Bean Container Capabilities
+     ↓
+ApplicationContext
+     ↓
+Bean Capabilities + Additional Application Features
+```
+
+## 🎤 Interview-Ready Answer
+
+> **BeanFactory is the basic IoC container interface in Spring. It provides the fundamental functionality for creating, retrieving, configuring, and managing beans and their dependencies. In modern Spring applications, we generally use ApplicationContext, which builds on BeanFactory capabilities and provides additional features.**
+
+---
 
 <h3 id="sb_018">ApplicationContext vs BeanFactory</h3>
 
+Both `BeanFactory` and `ApplicationContext` are Spring IoC container interfaces, but `ApplicationContext` provides more application-level features and is normally used in modern Spring applications.
 
+### ⚠️ Important Interview Point: Lazy vs Eager
+
+```text
+BeanFactory = Lazy
+ApplicationContext = Eager
+```
+
+> `ApplicationContext` normally pre-instantiates non-lazy singleton beans during context initialization. However, beans can still explicitly be configured for lazy initialization.
+
+The major difference is the **additional application-level capabilities provided by `ApplicationContext`**.
+
+---
 
 <h3 id="sb_019">What is Bean Scope?</h3>
 
+**Bean Scope defines how many instances of a Spring Bean are created and how long those instances are managed by the Spring Container.**
 
+In simple terms, Bean Scope answers:
+
+```text
+How many Bean objects should Spring create?
+                +
+How long should each Bean instance live?
+```
+### 🔹 Common Spring Bean Scopes
+
+| Scope | Instance |
+|---|---|
+| `singleton` | One bean instance per Spring container for that bean definition |
+| `prototype` | A new bean instance each time it is requested from the container |
+| `request` | One bean instance per HTTP request |
+| `session` | One bean instance per HTTP session |
+| `application` | One bean instance per web application's `ServletContext` |
+| `websocket` | One bean instance per WebSocket session |
+
+### 🔹 How to Define a Scope
+
+```java
+@Component
+@Scope("prototype")
+public class ReportService {
+}
+```
+
+Or using constants:
+
+```java
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public class ReportService {
+}
+```
+
+---
 
 <h3 id="sb_020">Singleton Scope</h3>
 
+**Singleton is the default bean scope in Spring.**
 
+In Singleton Scope, Spring creates **one instance of a bean for each bean definition within a Spring IoC Container** and returns that same instance whenever the bean is requested.
+
+
+### 🔹 Example
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+Since no scope is specified, `OrderService` uses the default **singleton scope**.
+
+If the bean is requested multiple times:
+
+```java
+OrderService service1 = context.getBean(OrderService.class);
+OrderService service2 = context.getBean(OrderService.class);
+```
+
+then:
+
+```java
+service1 == service2
+```
+
+will normally be:
+
+```text
+true
+```
+
+because both references point to the same Spring-managed bean instance.
+
+### 🔹 How It Works
+
+```text
+Spring Container Starts
+        ↓
+Creates OrderService Bean
+        ↓
+Stores the Bean
+        ↓
+Request 1 → Same OrderService
+Request 2 → Same OrderService
+Request 3 → Same OrderService
+```
+### ⚠️ Important: Thread Safety
+
+A Spring `singleton` bean is normally **shared by multiple requests**.
+
+Because of this, avoid storing **request-specific data in mutable instance variables**.
+
+### ❌ Avoid Shared Mutable State
+
+```java
+@Service
+public class OrderService {
+
+    private String customerName;
+
+    public void createOrder(String name) {
+        customerName = name;
+    }
+}
+```
+
+If two users call this method:
+
+```text
+User A → customerName = "Indhu"
+
+User B → customerName = "Rahul"
+```
+
+Both requests use the same `OrderService` object, so one request can overwrite the value used by another request.
+
+### ✅ Prefer Local Variables
+
+```java
+@Service
+public class OrderService {
+
+    public void createOrder(String name) {
+
+        String customerName = name;
+
+        // process order
+    }
+}
+```
+
+Now each method call has its own local variable:
+
+```text
+User A → "Indhu" → separate method call
+
+User B → "Rahul" → separate method call
+```
+
+They don't overwrite each other's local variable.
+
+### 🧠 Simple Rule
+
+```text
+Singleton Bean
+      ↓
+Shared by multiple requests
+      ↓
+Avoid request-specific mutable instance fields
+      ↓
+Use method-local variables where appropriate
+      ↓
+Keep service classes generally stateless
+```
+
+> **Interview Point:** A Spring singleton bean is not automatically thread-safe. We should design singleton services to avoid shared mutable state, especially request-specific data.
+
+---
 
 <h3 id="sb_021">Prototype Scope</h3>
 
+In **Prototype Scope**, Spring creates a **new bean instance every time that bean is requested from the Spring Container**.
 
+### 🔹 Example
+
+```java
+@Component
+@Scope("prototype")
+public class ReportService {
+}
+```
+
+Now:
+
+```java
+ReportService service1 =
+        context.getBean(ReportService.class);
+
+ReportService service2 =
+        context.getBean(ReportService.class);
+```
+
+Here:
+
+```java
+service1 == service2
+```
+
+returns:
+
+```text
+false
+```
+
+because Spring creates two different objects.
+
+### 🔹 How It Works
+
+```text
+Request Bean
+    ↓
+Create Object 1
+
+
+Request Bean Again
+    ↓
+Create Object 2
+
+
+Request Bean Again
+    ↓
+Create Object 3
+```
+
+So:
+
+```text
+Prototype Scope
+      ↓
+New Bean Instance
+      ↓
+Every time requested from container
+```
+
+### 🔹 When Do We Use Prototype Scope?
+
+Prototype scope is useful when each usage requires a **separate object with its own mutable state**.
+
+For example:
+
+```java
+@Component
+@Scope("prototype")
+public class ReportBuilder {
+
+    private String reportName;
+
+    private List<String> data = new ArrayList<>();
+}
+```
+
+If different operations need independent `ReportBuilder` instances, prototype scope can provide a fresh instance for each container lookup.
+
+### ⚠️ Important: Prototype Bean Lifecycle
+
+For prototype beans, Spring:
+
+```text
+Creates Bean
+    ↓
+Injects Dependencies
+    ↓
+Initializes Bean
+    ↓
+Returns Bean
+```
+
+After that, Spring does **not manage the complete destruction lifecycle** in the same way it does for singleton beans.
+
+For example, destruction callbacks such as:
+
+```java
+@PreDestroy
+```
+
+are not automatically called by the container when a prototype instance is no longer needed.
+
+The application using the prototype bean is responsible for any necessary cleanup.
+
+### ⚠️ Important Interview Point
+
+Prototype does **not** mean:
+
+> One new object automatically for every HTTP request.
+
+That is:
+
+```text
+request scope
+```
+
+Prototype means:
+
+> **A new instance whenever the bean is requested from the container.**
+
+## 🎤 Interview-Ready Answer
+
+> **Prototype is a Spring bean scope where the container creates a new bean instance every time the bean is requested from the container. It is useful when separate instances with independent state are required. Spring creates, injects, and initializes prototype beans, but unlike singleton beans, it does not manage their full destruction lifecycle.**
+
+---
 
 <h3 id="sb_022">Request Scope</h3>
 
+**Request Scope means Spring creates one new bean object for each HTTP request.**
 
+The bean exists only while that particular HTTP request is being processed.
+
+### 🔹 Simple Example
+
+```java
+@Component
+@RequestScope
+public class RequestDetails {
+
+}
+```
+
+Suppose three API requests reach the application:
+
+```text
+Request 1
+   ↓
+RequestDetails Object 1
+
+
+Request 2
+   ↓
+RequestDetails Object 2
+
+
+Request 3
+   ↓
+RequestDetails Object 3
+```
+
+Each HTTP request gets its **own separate object**.
+
+### 🔹 Real Example
+
+Suppose we want to store information related only to the current HTTP request:
+
+```java
+@Component
+@RequestScope
+public class RequestContext {
+
+    private String requestId;
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+}
+```
+
+If two users call the API:
+
+```text
+User A Request
+      ↓
+RequestContext Object 1
+requestId = "REQ-101"
+
+
+User B Request
+      ↓
+RequestContext Object 2
+requestId = "REQ-102"
+```
+
+The request-specific state is not shared between those two HTTP requests through this bean.
+
+### 🔹 Lifecycle
+
+```text
+HTTP Request Starts
+        ↓
+Request-scoped Bean Created
+        ↓
+Bean Used During Request
+        ↓
+HTTP Request Completes
+        ↓
+Bean Lifecycle Ends
+```
+
+### 🔹 When to Use Request Scope
+
+Use it when an object needs to hold data that belongs only to the **current HTTP request**, such as:
+
+- Request-specific context
+- Correlation/request ID
+- Request processing metadata
+
+### 🎤 Interview-Ready Answer
+
+> **Request Scope creates one bean instance for each HTTP request. The bean is available during that request and its lifecycle ends when the request completes. I would use it when I need to maintain data that belongs specifically to the current HTTP request.**
+
+---
 
 <h3 id="sb_023">Session Scope</h3>
 
+**Session Scope means Spring creates one bean object for each HTTP user session.**
 
+The same bean object is reused for all requests that belong to the **same session**.
+
+### 🔹 Simple Example
+
+```java
+@Component
+@SessionScope
+public class UserSession {
+
+    private String username;
+
+}
+```
+
+Suppose two users log in:
+
+```text
+User A
+   ↓
+HTTP Session A
+   ↓
+UserSession Object 1
+
+
+User B
+   ↓
+HTTP Session B
+   ↓
+UserSession Object 2
+```
+
+If User A sends multiple requests:
+
+```text
+Request 1 ─┐
+Request 2 ─┼──→ Session A ──→ Same UserSession Object
+Request 3 ─┘
+```
+
+Spring keeps using the same session-scoped bean until that session ends.
+
+### 🔹 Lifecycle
+
+```text
+HTTP Session Starts
+        ↓
+Session Bean Created
+        ↓
+Same Bean Used Across Requests
+        ↓
+Session Ends / Expires
+        ↓
+Bean Lifecycle Ends
+```
+
+### 🔹 When to Use Session Scope
+
+Use Session Scope when data needs to remain available across **multiple requests from the same user session**.
+
+Examples:
+
+- Shopping cart state
+- Multi-step form data
+- User-specific temporary session information
+
+### 🔥 Request Scope vs Session Scope
+
+```text
+Request Scope
+
+Request 1 → Object 1
+Request 2 → Object 2
+Request 3 → Object 3
+```
+
+```text
+Session Scope
+
+Session A
+   ├── Request 1
+   ├── Request 2
+   └── Request 3
+          ↓
+     Same Object
+```
+
+### 🎤 Interview-Ready Answer
+
+> **Session Scope creates one bean instance for each HTTP session. The same bean is shared across multiple requests within that session, and its lifecycle ends when the session expires or is invalidated. It is useful for temporary user-specific state that needs to survive across multiple requests.**
+
+### 🧠 Easy to Remember
+
+```text
+Request Scope
+    ↓
+One Object per HTTP Request
+
+
+Session Scope
+    ↓
+One Object per HTTP Session
+```
+
+---
 
 <h3 id="sb_024">Application Scope</h3>
 
