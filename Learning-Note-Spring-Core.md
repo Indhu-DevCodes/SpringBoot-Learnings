@@ -1,3 +1,1977 @@
+# Spring & Spring Boot Interview Preparation
+
+<br>
+
+## 1. Core Spring Fundamentals
+
+<br>
+
+1. [What is Spring Framework?](#sb_01)<br>
+2. [Why was Spring introduced?](#sb_02)<br>
+3. [What problems does Spring solve?](#sb_03)<br>
+4. [What is IoC (Inversion of Control)?](#sb_04)<br>
+5. [What is Dependency Injection?](#sb_05)<br>
+6. [IoC vs Dependency Injection](#sb_06)<br>
+7. [What are the different types of Dependency Injection?](#sb_07)<br>
+8. [What is Constructor Injection?](#sb_08)<br>
+9. [What is Setter Injection?](#sb_09)<br>
+10. [What is Field Injection?](#sb_10)<br>
+11. [Constructor vs Setter vs Field Injection](#sb_11)<br>
+12. [Why is Constructor Injection recommended?](#sb_12)<br>
+13. [What is a Spring Bean?](#sb_13)<br>
+14. [Java Object vs Spring Bean](#sb_14)<br>
+15. [What is Spring Container?](#sb_15)<br>
+16. [What is ApplicationContext?](#sb_16)<br>
+17. [What is BeanFactory?](#sb_17)<br>
+18. [ApplicationContext vs BeanFactory](#sb_18)<br>
+19. [What is Bean Scope?](#sb_19)<br>
+20. [What is Singleton Scope?](#sb_20)<br>
+21. [What is Prototype Scope?](#sb_21)<br>
+22. [What is Request Scope?](#sb_22)<br>
+23. [What is Session Scope?](#sb_23)<br>
+24. [What is Application Scope?](#sb_24)<br>
+25. [What is WebSocket Scope?](#sb_25)<br>
+26. [Spring Singleton vs Java Singleton](#sb_26)<br>
+27. [Can a Singleton Bean inject a Prototype Bean?](#sb_27)<br>
+28. [What problem occurs when Prototype Bean is injected into Singleton?](#sb_28)<br>
+29. [What is @Lookup?](#sb_29)<br>
+30. [What is Bean Lifecycle?](#sb_30)<br>
+31. [Explain the complete Spring Bean Lifecycle.](#sb_31)<br>
+32. [What is @PostConstruct?](#sb_32)<br>
+33. [What is @PreDestroy?](#sb_33)<br>
+34. [What is InitializingBean?](#sb_34)<br>
+35. [What is DisposableBean?](#sb_35)<br>
+36. [@PostConstruct vs InitializingBean](#sb_36)<br>
+37. [What are initMethod and destroyMethod?](#sb_37)<br>
+38. [What is @Component?](#sb_38)<br>
+39. [What is @Service?](#sb_39)<br>
+40. [What is @Repository?](#sb_40)<br>
+41. [What is @Controller?](#sb_41)<br>
+42. [What is @RestController?](#sb_42)<br>
+43. [@Controller vs @RestController](#sb_43)<br>
+44. [@Component vs @Bean](#sb_44)<br>
+45. [Why do we have @Service if @Component can do the same thing?](#sb_45)<br>
+46. [What special behavior does @Repository provide?](#sb_46)<br>
+47. [What is Component Scanning?](#sb_47)<br>
+48. [How does @ComponentScan work?](#sb_48)<br>
+49. [What happens if a component is outside the base package?](#sb_49)<br>
+50. [What are Spring configuration approaches?](#sb_50)<br>
+51. [What is XML Configuration?](#sb_51)<br>
+52. [What is Java Configuration?](#sb_52)<br>
+53. [What is Annotation Configuration?](#sb_53)<br>
+54. [What is @Configuration?](#sb_54)<br>
+55. [What is @Bean?](#sb_55)<br>
+56. [What is @Import?](#sb_56)<br>
+57. [What is @Value?](#sb_57)<br>
+58. [What is Environment?](#sb_58)<br>
+59. [What is @PropertySource?](#sb_59)<br>
+
+<br><br>
+
+<br>
+
+## Phase 2: Spring Internals
+
+60. [How does Spring Container start?](#sb_60)
+61. [How does Spring discover Beans?](#sb_61)
+62. [How does Spring instantiate Beans?](#sb_62)
+63. [How are dependencies resolved?](#sb_63)
+64. [How does Spring maintain Beans internally?](#sb_64)
+65. [What is BeanDefinition?](#sb_65)
+66. [What is BeanDefinitionRegistry?](#sb_66)
+67. [What is BeanFactoryPostProcessor?](#sb_67)
+68. [What is BeanPostProcessor?](#sb_68)
+69. [BeanFactoryPostProcessor vs BeanPostProcessor](#sb_69)
+70. [When does BeanPostProcessor execute?](#sb_70)
+71. [How does @Autowired work internally?](#sb_71)
+72. [What is AutowiredAnnotationBeanPostProcessor?](#sb_72)
+73. [How does Spring resolve dependency by type?](#sb_73)
+74. [What happens if multiple Beans of the same type exist?](#sb_74)
+75. [What is NoUniqueBeanDefinitionException?](#sb_75)
+76. [What is NoSuchBeanDefinitionException?](#sb_76)
+77. [What is @Qualifier?](#sb_77)
+78. [What is @Primary?](#sb_78)
+79. [@Qualifier vs @Primary](#sb_79)
+80. [Can @Autowired be used on constructors?](#sb_80)
+81. [Is @Autowired required for a single constructor?](#sb_81)
+82. [What is Circular Dependency?](#sb_82)
+83. [Why can constructor circular dependency fail?](#sb_83)
+84. [How does Spring handle setter/field circular dependency?](#sb_84)
+85. [What are Spring's three-level singleton caches?](#sb_85)
+86. [What is singletonObjects?](#sb_86)
+87. [What is earlySingletonObjects?](#sb_87)
+88. [What is singletonFactories?](#sb_88)
+89. [Why are circular references discouraged?](#sb_89)
+90. [How do you redesign code to remove circular dependencies?](#sb_90)
+91. [What is Lazy Initialization?](#sb_91)
+92. [What is @Lazy?](#sb_92)
+93. [Where can @Lazy be used?](#sb_93)
+94. [Lazy vs Eager initialization](#sb_94)
+95. [What is Spring Expression Language (SpEL)?](#sb_95)
+96. [What can SpEL be used for?](#sb_96)
+97. [What are proxies in Spring?](#sb_97)
+98. [JDK Dynamic Proxy vs CGLIB Proxy](#sb_98)
+99. [When does Spring use a JDK proxy?](#sb_99)
+100. [When does Spring use a CGLIB proxy?](#sb_100)
+101. [Why are Spring proxies important?](#sb_101)
+102. [What is self-invocation?](#sb_102)
+103. [Why can self-invocation bypass Spring proxy behavior?](#sb_103)
+104. [Which Spring features depend heavily on proxies?](#sb_104)
+
+<br><br>
+
+<br>
+
+<br>
+
+## Phase 3: Spring AOP
+
+<br>
+
+105. [What is AOP?](#sb_105)
+106. [Why was AOP introduced?](#sb_106)
+107. [What are Cross-Cutting Concerns?](#sb_107)
+108. [What is an Aspect?](#sb_108)
+109. [What is Advice?](#sb_109)
+110. [What is Join Point?](#sb_110)
+111. [What is Pointcut?](#sb_111)
+112. [What is Target Object?](#sb_112)
+113. [What is Weaving?](#sb_113)
+114. [Compile-time vs Load-time vs Runtime weaving](#sb_114)
+115. [How does Spring AOP work internally?](#sb_115)
+116. [Spring AOP vs AspectJ](#sb_116)
+117. [What is @Aspect?](#sb_117)
+118. [What is @Before?](#sb_118)
+119. [What is @After?](#sb_119)
+120. [What is @AfterReturning?](#sb_120)
+121. [What is @AfterThrowing?](#sb_121)
+122. [What is @Around?](#sb_122)
+123. [Which Advice is most powerful?](#sb_123)
+124. [What is ProceedingJoinPoint?](#sb_124)
+125. [What happens if proceed() is not called?](#sb_125)
+126. [How do you write a Pointcut expression?](#sb_126)
+127. [Explain the execution() Pointcut expression.](#sb_127)
+128. [Can multiple Pointcuts be combined?](#sb_128)
+129. [How do you control Aspect execution order?](#sb_129)
+130. [What is @Order?](#sb_130)
+131. [How does AOP use proxies?](#sb_131)
+132. [Why does AOP not work as expected with self-invocation?](#sb_132)
+133. [Can private methods be intercepted?](#sb_133)
+134. [Can final methods cause proxy limitations?](#sb_134)
+135. [Logging using AOP](#sb_135)
+136. [Performance monitoring using AOP](#sb_136)
+137. [Auditing using AOP](#sb_137)
+138. [Security using AOP](#sb_138)
+139. [Transaction management using AOP](#sb_139)
+
+<br>
+
+<br>
+
+## Phase 4: Spring Boot Fundamentals and Internals
+
+<br>
+
+140. [Why Spring Boot?](#sb_140)
+141. [Spring vs Spring MVC vs Spring Boot](#sb_141)
+142. [Advantages of Spring Boot](#sb_142)
+143. [What is `@SpringBootApplication`?](#sb_143)
+144. [What annotations are inside `@SpringBootApplication`?](#sb_144)
+145. [What is `@SpringBootConfiguration`?](#sb_145)
+146. [What is `@EnableAutoConfiguration`?](#sb_146)
+147. [What is `@ComponentScan`?](#sb_147)
+148. [What happens when `SpringApplication.run()` executes?](#sb_148)
+149. [Explain Spring Boot application startup flow.](#sb_149)
+150. [How is `ApplicationContext` created?](#sb_150)
+151. [How does component scanning start?](#sb_151)
+152. [How does Auto Configuration work?](#sb_152)
+153. [What is conditional configuration?](#sb_153)
+154. [What is `@Conditional`?](#sb_154)
+155. [What is `@ConditionalOnClass`?](#sb_155)
+156. [What is `@ConditionalOnMissingBean`?](#sb_156)
+157. [What is `@ConditionalOnProperty`?](#sb_157)
+158. [What is `@ConditionalOnBean`?](#sb_158)
+159. [How does Boot decide which Auto Configurations to load?](#sb_159)
+160. [How can Auto Configuration be excluded?](#sb_160)
+161. [What are Starter Dependencies?](#sb_161)
+162. [How do starters simplify dependency management?](#sb_162)
+163. [What is Spring Boot's parent POM?](#sb_163)
+164. [What is dependency management?](#sb_164)
+165. [What is an Embedded Server?](#sb_165)
+166. [How does embedded Tomcat start?](#sb_166)
+167. [Tomcat vs Servlet Container](#sb_167)
+168. [Tomcat vs Application Server](#sb_168)
+169. [How do you replace Tomcat with Jetty or Undertow?](#sb_169)
+170. [What is `CommandLineRunner`?](#sb_170)
+171. [What is `ApplicationRunner`?](#sb_171)
+172. [`CommandLineRunner` vs `ApplicationRunner`](#sb_172)
+173. [What are Profiles?](#sb_173)
+174. [What is `@Profile`?](#sb_174)
+175. [How do dev/test/prod configurations work?](#sb_175)
+176. [`application.properties` vs `application.yml`](#sb_176)
+177. [Configuration precedence in Spring Boot](#sb_177)
+178. [Environment variables vs properties](#sb_178)
+179. [What is `@ConfigurationProperties`?](#sb_179)
+180. [`@Value` vs `@ConfigurationProperties`](#sb_180)
+181. [What is Actuator?](#sb_181)
+182. [Important Actuator endpoints](#sb_182)
+183. [`health`](#sb_183)
+184. [`metrics`](#sb_184)
+185. [`info`](#sb_185)
+186. [`beans`](#sb_186)
+187. [`env`](#sb_187)
+188. [How do you secure Actuator endpoints?](#sb_188)
+
+<br>
+
+
+# 1. Core Spring Fundamentals
+
+<br>
+
+<h3 id="sb_01">What is Spring Framework?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_02">Why was Spring introduced?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_03">What problems does Spring solve?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_04">What is IoC (Inversion of Control)?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_05">What is Dependency Injection?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_06">IoC vs Dependency Injection</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_07">What are the different types of Dependency Injection?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_08">What is Constructor Injection?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_09">What is Setter Injection?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_10">What is Field Injection?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_11">Constructor vs Setter vs Field Injection</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_12">Why is Constructor Injection recommended?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_13">What is a Spring Bean?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_14">Java Object vs Spring Bean</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_15">What is Spring Container?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_16">What is ApplicationContext?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_17">What is BeanFactory?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_18">ApplicationContext vs BeanFactory</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_19">What is Bean Scope?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_20">What is Singleton Scope?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_21">What is Prototype Scope?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_22">What is Request Scope?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_23">What is Session Scope?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_24">What is Application Scope?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_25">What is WebSocket Scope?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_26">Spring Singleton vs Java Singleton</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_27">Can a Singleton Bean inject a Prototype Bean?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_28">What problem occurs when Prototype Bean is injected into Singleton?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_29">What is @Lookup?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_30">What is Bean Lifecycle?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_31">Explain the complete Spring Bean Lifecycle.</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_32">What is @PostConstruct?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_33">What is @PreDestroy?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_34">What is InitializingBean?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_35">What is DisposableBean?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_36">@PostConstruct vs InitializingBean</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_37">What are initMethod and destroyMethod?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_38">What is @Component?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_39">What is @Service?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_40">What is @Repository?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_41">What is @Controller?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_42">What is @RestController?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_43">@Controller vs @RestController</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_44">@Component vs @Bean</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_45">Why do we have @Service if @Component can do the same thing?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_46">What special behavior does @Repository provide?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_47">What is Component Scanning?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_48">How does @ComponentScan work?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_49">What happens if a component is outside the base package?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_50">What are Spring configuration approaches?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_51">What is XML Configuration?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_52">What is Java Configuration?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_53">What is Annotation Configuration?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+## Phase 2: Spring Internals
+
+<br>
+
+<h3 id="sb_60">60. How does Spring Container start?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_61">61. How does Spring discover Beans?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_62">62. How does Spring instantiate Beans?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_63">63. How are dependencies resolved?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_64">64. How does Spring maintain Beans internally?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_65">65. What is BeanDefinition?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_66">66. What is BeanDefinitionRegistry?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_67">67. What is BeanFactoryPostProcessor?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_68">68. What is BeanPostProcessor?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_69">69. BeanFactoryPostProcessor vs BeanPostProcessor</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_70">70. When does BeanPostProcessor execute?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_71">71. How does @Autowired work internally?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_72">72. What is AutowiredAnnotationBeanPostProcessor?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_73">73. How does Spring resolve dependency by type?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_74">74. What happens if multiple Beans of the same type exist?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_75">75. What is NoUniqueBeanDefinitionException?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_76">76. What is NoSuchBeanDefinitionException?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_77">77. What is @Qualifier?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_78">78. What is @Primary?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_79">79. @Qualifier vs @Primary</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_80">80. Can @Autowired be used on constructors?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_81">81. Is @Autowired required for a single constructor?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_82">82. What is Circular Dependency?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_83">83. Why can constructor circular dependency fail?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_84">84. How does Spring handle setter/field circular dependency?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_85">85. What are Spring's three-level singleton caches?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_86">86. What is singletonObjects?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_87">87. What is earlySingletonObjects?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_88">88. What is singletonFactories?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_89">89. Why are circular references discouraged?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_90">90. How do you redesign code to remove circular dependencies?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_91">91. What is Lazy Initialization?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_92">92. What is @Lazy?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_93">93. Where can @Lazy be used?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_94">94. Lazy vs Eager initialization</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_95">95. What is Spring Expression Language (SpEL)?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_96">96. What can SpEL be used for?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_97">97. What are proxies in Spring?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_98">98. JDK Dynamic Proxy vs CGLIB Proxy</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_99">99. When does Spring use a JDK proxy?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_100">100. When does Spring use a CGLIB proxy?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_101">101. Why are Spring proxies important?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_102">102. What is self-invocation?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_103">103. Why can self-invocation bypass Spring proxy behavior?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_104">104. Which Spring features depend heavily on proxies?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+## Phase 3: Spring AOP
+
+<br>
+
+<h3 id="sb_105">105. What is AOP?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_106">106. Why was AOP introduced?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_107">107. What are Cross-Cutting Concerns?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_108">108. What is an Aspect?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_109">109. What is Advice?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_110">110. What is Join Point?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_111">111. What is Pointcut?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_112">112. What is Target Object?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_113">113. What is Weaving?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_114">114. Compile-time vs Load-time vs Runtime weaving</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_115">115. How does Spring AOP work internally?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_116">116. Spring AOP vs AspectJ</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_117">117. What is @Aspect?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_118">118. What is @Before?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_119">119. What is @After?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_120">120. What is @AfterReturning?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_121">121. What is @AfterThrowing?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_122">122. What is @Around?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_123">123. Which Advice is most powerful?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_124">124. What is ProceedingJoinPoint?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_125">125. What happens if proceed() is not called?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_126">126. How do you write a Pointcut expression?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_127">127. Explain the execution() Pointcut expression.</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_128">128. Can multiple Pointcuts be combined?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_129">129. How do you control Aspect execution order?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_130">130. What is @Order?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_131">131. How does AOP use proxies?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_132">132. Why does AOP not work as expected with self-invocation?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_133">133. Can private methods be intercepted?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_134">134. Can final methods cause proxy limitations?</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_135">135. Logging using AOP</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_136">136. Performance monitoring using AOP</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_137">137. Auditing using AOP</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_138">138. Security using AOP</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+<br>
+
+<h3 id="sb_139">139. Transaction management using AOP</h3>
+
+<br>
+
+<!-- Answer goes here -->
+
+
+## Phase 4: Spring Boot Fundamentals and Internals
+
+<br>
+<h3 id="sb_140">Why Spring Boot?</h3>
+<br>
+
+<h3 id="sb_141">Spring vs Spring MVC vs Spring Boot</h3>
+<br>
+
+<h3 id="sb_142">Advantages of Spring Boot</h3>
+<br>
+
+<h3 id="sb_143">What is @SpringBootApplication?</h3>
+<br>
+
+<h3 id="sb_144">What annotations are inside @SpringBootApplication?</h3>
+<br>
+
+<h3 id="sb_145">What is @SpringBootConfiguration?</h3>
+<br>
+
+<h3 id="sb_146">What is @EnableAutoConfiguration?</h3>
+<br>
+
+<h3 id="sb_147">What is @ComponentScan?</h3>
+<br>
+
+<h3 id="sb_148">What happens when SpringApplication.run() executes?</h3>
+<br>
+
+<h3 id="sb_149">Explain Spring Boot application startup flow.</h3>
+<br>
+
+<h3 id="sb_150">How is ApplicationContext created?</h3>
+<br>
+
+<h3 id="sb_151">How does component scanning start?</h3>
+<br>
+
+<h3 id="sb_152">How does Auto Configuration work?</h3>
+<br>
+
+<h3 id="sb_153">What is conditional configuration?</h3>
+<br>
+
+<h3 id="sb_154">What is @Conditional?</h3>
+<br>
+
+<h3 id="sb_155">What is @ConditionalOnClass?</h3>
+<br>
+
+<h3 id="sb_156">What is @ConditionalOnMissingBean?</h3>
+<br>
+
+<h3 id="sb_157">What is @ConditionalOnProperty?</h3>
+<br>
+
+<h3 id="sb_158">What is @ConditionalOnBean?</h3>
+<br>
+
+<h3 id="sb_159">How does Boot decide which Auto Configurations to load?</h3>
+<br>
+
+<h3 id="sb_160">How can Auto Configuration be excluded?</h3>
+<br>
+
+<h3 id="sb_161">What are Starter Dependencies?</h3>
+<br>
+
+<h3 id="sb_162">How do starters simplify dependency management?</h3>
+<br>
+
+<h3 id="sb_163">What is Spring Boot's parent POM?</h3>
+<br>
+
+<h3 id="sb_164">What is dependency management?</h3>
+<br>
+
+<h3 id="sb_165">What is an Embedded Server?</h3>
+<br>
+
+<h3 id="sb_166">How does embedded Tomcat start?</h3>
+<br>
+
+<h3 id="sb_167">Tomcat vs Servlet Container</h3>
+<br>
+
+<h3 id="sb_168">Tomcat vs Application Server</h3>
+<br>
+
+<h3 id="sb_169">How do you replace Tomcat with Jetty or Undertow?</h3>
+<br>
+
+<h3 id="sb_170">What is CommandLineRunner?</h3>
+<br>
+
+<h3 id="sb_171">What is ApplicationRunner?</h3>
+<br>
+
+<h3 id="sb_172">CommandLineRunner vs ApplicationRunner</h3>
+<br>
+
+<h3 id="sb_173">What are Profiles?</h3>
+<br>
+
+<h3 id="sb_174">What is @Profile?</h3>
+<br>
+
+<h3 id="sb_175">How do dev/test/prod configurations work?</h3>
+<br>
+
+<h3 id="sb_176">application.properties vs application.yml</h3>
+<br>
+
+<h3 id="sb_177">Configuration precedence in Spring Boot</h3>
+<br>
+
+<h3 id="sb_178">Environment variables vs properties</h3>
+<br>
+
+<h3 id="sb_179">What is @ConfigurationProperties?</h3>
+<br>
+
+<h3 id="sb_180">@Value vs @ConfigurationProperties</h3>
+<br>
+
+<h3 id="sb_181">What is Actuator?</h3>
+<br>
+
+<h3 id="sb_182">Important Actuator endpoints</h3>
+<br>
+
+<h3 id="sb_183">health</h3>
+<br>
+
+<h3 id="sb_184">metrics</h3>
+<br>
+
+<h3 id="sb_185">info</h3>
+<br>
+
+<h3 id="sb_186">beans</h3>
+<br>
+
+<h3 id="sb_187">env</h3>
+<br>
+
+<h3 id="sb_188">How do you secure Actuator endpoints?</h3>
+<br>
+
+### Phase 1: Core Spring Fundamentals
+
+1. [What is Spring Framework?](#sb_01)
+2. [Why was Spring introduced?](#sb_02)
+3. [What is IoC (Inversion of Control)?](#sb_03)
+4. [What is Dependency Injection?](#sb_04)
+5. [What is Constructor Injection?](#sb_05)
+6. [What is Setter Injection?](#sb_06)
+7. [What is Field Injection?](#sb_07)
+8. [What is Spring Bean Lifecycle?](#sb_08)
+9. [What are Bean Scopes?](#sb_09)
+10. [What is Singleton Scope?](#sb_10)
+11. [What is Prototype Scope?](#sb_11)
+12. [What is Request Scope?](#sb_12)
+13. [What is Session Scope?](#sb_13)
+14. [What are @Component, @Service, @Repository and @Controller?](#sb_14)
+15. [What is Component Scanning?](#sb_15)
+16. [What are Spring Configuration Types?](#sb_16)
+17. [What is XML-based Configuration?](#sb_17)
+18. [What is Java-based Configuration?](#sb_18)
+19. [What is Annotation-based Configuration?](#sb_19)
+
+
+### Phase 2: Spring Internals - Very Important for 5+ Years
+
+20. [ApplicationContext vs BeanFactory](#sb_20)
+21. [How does Spring create Beans?](#sb_21)
+22. [What is BeanPostProcessor?](#sb_22)
+23. [What is Spring Container?](#sb_23)
+24. [How does @Autowired work internally?](#sb_24)
+25. [What is @Qualifier?](#sb_25)
+26. [What is @Primary?](#sb_26)
+27. [What is Circular Dependency?](#sb_27)
+28. [What is Lazy Initialization?](#sb_28)
+29. [What is Spring Expression Language (SpEL)?](#sb_29)
+
+
+### Phase 3: Spring AOP
+
+30. [Why do we need AOP?](#sb_30)
+31. [What are Advice Types?](#sb_31)
+32. [What is a Pointcut?](#sb_32)
+33. [What is a Join Point?](#sb_33)
+34. [What is an Aspect?](#sb_34)
+35. [What are real-time use cases of AOP?](#sb_35)
+36. [How is AOP used for Logging?](#sb_36)
+37. [How is AOP used for Security?](#sb_37)
+38. [How is AOP used for Transaction Management?](#sb_38)
+
+
+### Phase 4: Spring Boot Fundamentals
+
+39. [Why Spring Boot?](#sb_39)
+40. [Spring vs Spring Boot](#sb_40)
+41. [What is Auto Configuration?](#sb_41)
+42. [What are Starter Dependencies?](#sb_42)
+43. [What is Embedded Tomcat?](#sb_43)
+44. [What is the Spring Boot Project Structure?](#sb_44)
+45. [application.properties vs application.yml](#sb_45)
+46. [What is CommandLineRunner?](#sb_46)
+47. [What are Spring Profiles?](#sb_47)
+48. [What is Spring Boot Actuator?](#sb_48)
+
+
+### Phase 5: Spring Boot Enterprise Questions
+
+49. [How does a request flow from Browser to Database?](#sb_49)
+50. [What is DispatcherServlet?](#sb_50)
+51. [How does Exception Handling work in Spring Boot?](#sb_51)
+52. [What is @ControllerAdvice?](#sb_52)
+53. [What is Global Exception Handling?](#sb_53)
+54. [Filters vs Interceptors](#sb_54)
+55. [What are REST API Best Practices?](#sb_55)
+56. [How does Validation work in Spring Boot?](#sb_56)
+57. [What is Custom Validation?](#sb_57)
+
+
+### Phase 6: Spring Data JPA
+
+58. [JPA vs Hibernate](#sb_58)
+59. [What is Entity Lifecycle?](#sb_59)
+60. [What is First Level Cache?](#sb_60)
+61. [What is Second Level Cache?](#sb_61)
+62. [What are Fetch Types?](#sb_62)
+63. [Lazy vs Eager Loading](#sb_63)
+64. [What is the N+1 Problem?](#sb_64)
+65. [What are Cascade Types?](#sb_65)
+66. [What is JPQL?](#sb_66)
+67. [What is a Native Query?](#sb_67)
+68. [What are JPA Specifications?](#sb_68)
+69. [What is Pagination and Sorting?](#sb_69)
+
+
+### Phase 7: Transaction Management
+
+70. [What is @Transactional?](#sb_70)
+71. [How does @Transactional work internally?](#sb_71)
+72. [What are Transaction Propagation Types?](#sb_72)
+73. [REQUIRED Propagation](#sb_73)
+74. [REQUIRES_NEW Propagation](#sb_74)
+75. [SUPPORTS Propagation](#sb_75)
+76. [NOT_SUPPORTED Propagation](#sb_76)
+77. [MANDATORY Propagation](#sb_77)
+78. [NEVER Propagation](#sb_78)
+79. [NESTED Propagation](#sb_79)
+80. [What are Transaction Isolation Levels?](#sb_80)
+81. [What is READ_UNCOMMITTED?](#sb_81)
+82. [What is READ_COMMITTED?](#sb_82)
+83. [What is REPEATABLE_READ?](#sb_83)
+84. [What is SERIALIZABLE?](#sb_84)
+85. [What is Dirty Read?](#sb_85)
+86. [What is Non-Repeatable Read?](#sb_86)
+87. [What is Phantom Read?](#sb_87)
+
+
+### Phase 8: Security & Microservices
+
+88. [What is JWT Authentication?](#sb_88)
+89. [What is OAuth2?](#sb_89)
+90. [How does Spring Security Flow work?](#sb_90)
+91. [What is an API Gateway?](#sb_91)
+92. [What is Service Discovery?](#sb_92)
+93. [What is Feign Client?](#sb_93)
+94. [What is Circuit Breaker?](#sb_94)
+95. [What are Distributed Transactions?](#sb_95)
+
+
+### Important Questions for 5+ Years Experience
+
+96. [What happens when a Spring Boot application starts?](#sb_96)
+97. [How does AutoConfiguration work internally?](#sb_97)
+98. [What is LazyInitializationException?](#sb_98)
+99. [How do you solve the N+1 Query Problem?](#sb_99)
+100. [Explain Spring Security with JWT](#sb_100)
+
+
+---
+
+# Phase 1: Core Spring Fundamentals
+
+<h3 id="sb_01">1. What is Spring Framework?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_02">2. Why was Spring introduced?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_03">3. What is IoC (Inversion of Control)?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_04">4. What is Dependency Injection?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_05">5. What is Constructor Injection?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_06">6. What is Setter Injection?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_07">7. What is Field Injection?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_08">8. What is Spring Bean Lifecycle?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_09">9. What are Bean Scopes?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_10">10. What is Singleton Scope?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_11">11. What is Prototype Scope?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_12">12. What is Request Scope?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_13">13. What is Session Scope?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_14">14. What are @Component, @Service, @Repository and @Controller?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_15">15. What is Component Scanning?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_16">16. What are Spring Configuration Types?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_17">17. What is XML-based Configuration?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_18">18. What is Java-based Configuration?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_19">19. What is Annotation-based Configuration?</h3>
+
+<!-- Add answer here -->
+
+
+# Phase 2: Spring Internals
+
+<h3 id="sb_20">20. ApplicationContext vs BeanFactory</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_21">21. How does Spring create Beans?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_22">22. What is BeanPostProcessor?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_23">23. What is Spring Container?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_24">24. How does @Autowired work internally?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_25">25. What is @Qualifier?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_26">26. What is @Primary?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_27">27. What is Circular Dependency?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_28">28. What is Lazy Initialization?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_29">29. What is Spring Expression Language (SpEL)?</h3>
+
+<!-- Add answer here -->
+
+
+# Phase 3: Spring AOP
+
+<h3 id="sb_30">30. Why do we need AOP?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_31">31. What are Advice Types?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_32">32. What is a Pointcut?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_33">33. What is a Join Point?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_34">34. What is an Aspect?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_35">35. What are real-time use cases of AOP?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_36">36. How is AOP used for Logging?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_37">37. How is AOP used for Security?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_38">38. How is AOP used for Transaction Management?</h3>
+
+<!-- Add answer here -->
+
+
+# Phase 4: Spring Boot Fundamentals
+
+<h3 id="sb_39">39. Why Spring Boot?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_40">40. Spring vs Spring Boot</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_41">41. What is Auto Configuration?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_42">42. What are Starter Dependencies?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_43">43. What is Embedded Tomcat?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_44">44. What is the Spring Boot Project Structure?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_45">45. application.properties vs application.yml</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_46">46. What is CommandLineRunner?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_47">47. What are Spring Profiles?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_48">48. What is Spring Boot Actuator?</h3>
+
+<!-- Add answer here -->
+
+
+# Phase 5: Spring Boot Enterprise Questions
+
+<h3 id="sb_49">49. How does a request flow from Browser to Database?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_50">50. What is DispatcherServlet?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_51">51. How does Exception Handling work in Spring Boot?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_52">52. What is @ControllerAdvice?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_53">53. What is Global Exception Handling?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_54">54. Filters vs Interceptors</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_55">55. What are REST API Best Practices?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_56">56. How does Validation work in Spring Boot?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_57">57. What is Custom Validation?</h3>
+
+<!-- Add answer here -->
+
+
+# Phase 6: Spring Data JPA
+
+<h3 id="sb_58">58. JPA vs Hibernate</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_59">59. What is Entity Lifecycle?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_60">60. What is First Level. How does AutoConfiguration work internally?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_98">98. What is LazyInitializationException?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_99">99. How do you solve the N+1 Query Problem?</h3>
+
+<!-- Add answer here -->
+
+---
+
+<h3 id="sb_100">100. Explain Spring Security with JWT</h3>
+
+<!-- Add answer here -->
+
+
 # Spring - Dependency Injection
 
 ### First: What is a “dependency”? 
