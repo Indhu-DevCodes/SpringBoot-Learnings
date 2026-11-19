@@ -6057,11 +6057,752 @@ One Object per HTTP Session
 
 <h3 id="sb_024">Application Scope</h3>
 
+**Application Scope means Spring creates one bean instance for one web application's `ServletContext`.**
 
+The bean is shared across **all HTTP requests and all user sessions** belonging to that web application.
+
+### 🔹 Example
+
+```java
+@Component
+@ApplicationScope
+public class ApplicationInfo {
+
+    private boolean maintenanceMode;
+
+}
+```
+
+Conceptually:
+
+```text
+             Web Application
+                    ↓
+              ServletContext
+                    ↓
+          ApplicationInfo Bean
+              (One Object)
+                    ↓
+        ┌───────────┴───────────┐
+        ↓                       ↓
+     User A                  User B
+        ↓                       ↓
+  Multiple Requests       Multiple Requests
+```
+
+All requests and sessions in that web application access the same application-scoped bean.
+
+### 🔹 Real-Time Example
+
+Suppose we want to maintain application-wide runtime information:
+
+```java
+@Component
+@ApplicationScope
+public class ApplicationInfo {
+
+    private boolean maintenanceMode;
+
+    public boolean isMaintenanceMode() {
+        return maintenanceMode;
+    }
+
+    public void setMaintenanceMode(boolean maintenanceMode) {
+        this.maintenanceMode = maintenanceMode;
+    }
+}
+```
+
+If:
+
+```java
+maintenanceMode = true;
+```
+
+the same application-scoped bean is visible to requests across the web application.
+
+> ⚠️ Because this is shared mutable state, concurrent access must be considered. Also, in a multi-instance deployment, this state is local to that application instance. Use a shared store such as Redis or a database when the value must be consistent across multiple instances.
+
+### 🔹 Lifecycle
+
+```text
+Web Application Starts
+        ↓
+ServletContext Created
+        ↓
+Application-Scoped Bean Available
+        ↓
+Shared Across Requests & Sessions
+        ↓
+ServletContext Destroyed
+        ↓
+Bean Lifecycle Ends
+```
+
+### 🔥 Application Scope vs Singleton Scope
+
+They can look similar in a normal Spring Boot web application, but they are **not the same scope**.
+
+Singleton means:
+
+> **One bean instance per bean definition per Spring IoC Container.**
+
+Application scope means:
+
+> **One bean instance per ServletContext in a web application.**
+
+| Singleton Scope | Application Scope |
+|---|---|
+| One bean instance per bean definition per Spring container | One bean instance per `ServletContext` |
+| General Spring scope | Web-specific scope |
+| Default Spring scope | Must be explicitly selected |
+| Tied to Spring container | Tied to web application's `ServletContext` |
+
+### Easy Difference
+
+```text
+Singleton
+    ↓
+Spring Container boundary
+
+
+Application Scope
+    ↓
+ServletContext / Web Application boundary
+```
+
+> In a typical Spring Boot web application with one `ApplicationContext` and one `ServletContext`, they may **behave very similarly**, because both often result in one object. But their **scope boundaries are different**, so they should not be considered the same scope.
+
+### NOTE: Bean Definition vs ServletContext
+
+A Bean Definition is metadata/instructions that tell Spring how a bean should be created and managed.
+
+### Example 
+
+Spring scans OrderService and internally registers information roughly like:
+
+```text
+Bean name → orderService
+Bean class → OrderService
+Scope → singleton
+Lazy → false
+Dependencies → ...
+```
+
+Spring creates:
+
+```text
+OrderService Object #1
+```
+
+and keeps returning that same object for that bean definition.
+
+So:
+
+> Singleton = one bean instance per bean definition per Spring container.
+
+### ServletContext
+
+ServletContext belongs to the web application / Servlet environment. It represents the running web application to the Servlet container.
+
+For example, your Spring Boot application runs using embedded Tomcat:
+
+```text
+Tomcat
+↓
+Your Web Application
+↓
+ServletContext
+```
+
+Conceptually:
+
+```text
+ServletContext
+|
++── DispatcherServlet
+|
++── Filters
+|
++── Servlets
+|
++── Application-wide attributes/resources
+```
+
+There is generally one ServletContext for each deployed web application.
+
+> Tomcat or Jetty is the server/Servlet container.
+> ServletContext is an object created by that Servlet container to represent one deployed web application.
+
+### 🔹 ApplicationContext vs ServletContext
+
+Do not confuse these two:
+
+```text
+Tomcat / Jetty
+      ↓
+ServletContext
+      ↓
+Represents the Web Application
+
+
+Spring
+      ↓
+ApplicationContext
+      ↓
+Represents the Spring IoC Container
+      ↓
+Manages Spring Beans
+```
+
+### Simple Comparison
+
+| `ApplicationContext` | `ServletContext` |
+|---|---|
+| Spring concept | Servlet API concept |
+| Spring IoC container | Represents a web application |
+| Manages Spring Beans | Provides web-application context/resources |
+| Created/managed by Spring | Created/managed by Servlet container |
+| Can exist without a web application | Exists in Servlet-based web applications |
+
+## 🎤 Interview-Ready Answer
+
+> **Application Scope is a web-specific Spring bean scope where one bean instance is maintained for the web application's ServletContext. The same bean is shared across all requests and sessions within that web application, and its lifecycle is tied to the ServletContext. It differs from singleton scope because singleton is defined relative to the Spring container and bean definition, whereas application scope is defined relative to the ServletContext.**
+
+---
 
 <h3 id="sb_025">WebSocket Scope</h3>
 
+**WebSocket Scope means Spring creates one bean instance for each WebSocket session.**
 
+The same bean is available throughout that WebSocket connection and is destroyed when the WebSocket session ends.
+
+### 🔹 Simple Example
+
+```java
+@Component
+@Scope("websocket")
+public class ChatSession {
+
+    private String username;
+
+}
+```
+
+If two users establish separate WebSocket connections:
+
+```text
+User A
+   ↓
+WebSocket Session A
+   ↓
+ChatSession Object 1
+
+
+User B
+   ↓
+WebSocket Session B
+   ↓
+ChatSession Object 2
+```
+
+Each WebSocket session gets its own bean object.
+
+### 🔹 Real-Time Example
+
+A common example is a **real-time chat application**.
+
+Suppose a user connects to a chat server:
+
+```text
+User connects
+      ↓
+WebSocket connection established
+      ↓
+WebSocket Session created
+      ↓
+ChatSession Bean created
+      ↓
+User sends/receives multiple messages
+      ↓
+Same ChatSession Bean used
+      ↓
+User disconnects
+      ↓
+WebSocket Session ends
+      ↓
+Bean lifecycle ends
+```
+
+The bean can hold information related to that WebSocket session, such as temporary connection-specific state.
+
+### 🔹 When to Use WebSocket Scope
+
+WebSocket scope is useful for applications involving persistent WebSocket connections, such as:
+
+- 💬 Real-time chat
+- 🔔 Live notifications
+- 📈 Live dashboards
+- 🎮 Multiplayer/interactive applications
+- 📡 Real-time status updates
+
+### 🔥 WebSocket Scope vs Request Scope
+
+With a normal HTTP request:
+
+```text
+Client
+  ↓
+HTTP Request
+  ↓
+Response
+  ↓
+Request ends
+```
+
+With WebSocket:
+
+```text
+Client
+  ↓
+WebSocket Connection
+  ↓
+Connection remains open
+  ↓
+Message
+  ↓
+Message
+  ↓
+Message
+  ↓
+Connection closed
+```
+
+Therefore:
+
+```text
+Request Scope
+      ↓
+One bean per HTTP request
+
+
+WebSocket Scope
+      ↓
+One bean per WebSocket session
+```
+
+### 🎤 Interview-Ready Answer
+
+> **WebSocket Scope creates one Spring bean instance for each WebSocket session. The same bean remains available while that WebSocket connection/session is active and its lifecycle ends when the session ends. It is useful for maintaining connection-specific state in real-time applications such as chat, notifications, and live dashboards.**
+
+---
+
+## WebSocket
+
+**WebSocket is a communication protocol that creates a persistent, two-way connection between a client and a server.**
+
+It is mainly used when the server needs to send information to the client **immediately**, without waiting for the client to make another HTTP request.
+
+### 🔹 First Understand Normal HTTP
+
+In a normal REST API:
+
+```text
+Client
+   ↓
+HTTP Request
+   ↓
+Server
+   ↓
+HTTP Response
+   ↓
+Request/Response completes
+```
+
+Example:
+
+```http
+GET /orders/101
+```
+
+The client sends a request:
+
+```text
+Client
+  ↓
+"Give me Order 101"
+```
+
+Server responds:
+
+```json
+{
+  "id": 101,
+  "status": "SHIPPED"
+}
+```
+
+After the response, that HTTP request is finished.
+
+### 🔹 Problem: Real-Time Communication
+
+Imagine you're building a **chat application**.
+
+User A sends:
+
+```text
+Hello
+```
+
+User B should receive:
+
+```text
+Hello
+```
+
+immediately.
+
+With only traditional request/response communication, User B may need to repeatedly ask:
+
+```text
+Any new message?
+
+Any new message?
+
+Any new message?
+
+Any new message?
+```
+
+This is called **polling**.
+
+Conceptually:
+
+```text
+Client → Any message? → Server
+Client ← No          ← Server
+
+Client → Any message? → Server
+Client ← No          ← Server
+
+Client → Any message? → Server
+Client ← Yes         ← Server
+```
+
+This creates unnecessary repeated requests.
+
+### 🔥 WebSocket Solves This Differently
+
+With WebSocket, the connection remains open:
+
+```text
+Client
+   ↕
+   ↕
+   ↕
+Server
+```
+
+Both sides can send messages whenever needed.
+
+```text
+Client ───────→ Server
+       Message
+
+Client ←─────── Server
+       Message
+```
+
+This is called:
+
+**Full-Duplex Communication**
+
+Meaning:
+
+```text
+Client can send → Server
+
+AND
+
+Server can send → Client
+```
+
+over the established WebSocket connection.
+
+### 🔹 Chat Application Example
+
+Suppose:
+
+```text
+Indhu
+  ↓
+Chat Application
+  ↓
+WebSocket Connection
+  ↓
+Chat Server
+```
+
+The connection stays active.
+
+You send:
+
+```text
+Hello Rahul
+```
+
+Flow:
+
+```text
+Indhu
+   ↓
+WebSocket
+   ↓
+Server
+   ↓
+WebSocket
+   ↓
+Rahul
+```
+
+Rahul does not need to continuously call:
+
+```http
+GET /messages
+```
+
+The server can push the message through the existing WebSocket connection.
+
+### 🔹 HTTP vs WebSocket
+
+| HTTP / REST | WebSocket |
+|---|---|
+| Request-response communication | Persistent two-way communication |
+| Client normally initiates requests | Client and server can send messages |
+| Suitable for CRUD APIs | Suitable for real-time communication |
+| Response completes that request | Connection remains open |
+| Example: Create an order | Example: Live chat |
+
+### 🔹 Where Do We Use WebSocket?
+
+Typical real-time applications include:
+
+### 💬 Chat Applications
+
+```text
+User sends message
+       ↓
+Server
+       ↓
+Immediately push message
+       ↓
+Other User
+```
+
+
+### 🔔 Live Notifications
+
+For example:
+
+```text
+Order shipped
+      ↓
+Backend
+      ↓
+WebSocket message
+      ↓
+Browser
+      ↓
+"Your order has been shipped"
+```
+
+No page refresh is required.
+
+
+### 📈 Live Dashboard
+
+Imagine monitoring:
+
+```text
+CPU: 40%
+CPU: 48%
+CPU: 61%
+CPU: 72%
+```
+
+The server can continuously push updated data to the dashboard.
+
+### 🚕 Live Tracking
+
+For example:
+
+```text
+Driver location changes
+       ↓
+Backend receives location
+       ↓
+Push update
+       ↓
+Customer map updates
+```
+
+### 🎮 Multiplayer Applications
+
+```text
+Player moves
+      ↓
+Server
+      ↓
+Other players receive update
+```
+
+### 🔹 What is a WebSocket Session?
+
+When a client establishes a WebSocket connection, a **WebSocket session** represents that active communication session.
+
+Example:
+
+```text
+Indhu Browser
+      ↓
+WebSocket Connection
+      ↓
+WebSocket Session A
+```
+
+Another user:
+
+```text
+Rahul Browser
+      ↓
+WebSocket Connection
+      ↓
+WebSocket Session B
+```
+
+They have separate sessions.
+
+### 🔹 Now WebSocket Scope Makes Sense
+
+Suppose we define:
+
+```java
+@Component
+@Scope("websocket")
+public class ChatSession {
+
+    private String username;
+}
+```
+
+For each WebSocket session, Spring can maintain a separate bean instance.
+
+```text
+Indhu
+   ↓
+WebSocket Session A
+   ↓
+ChatSession Object A
+
+
+Rahul
+   ↓
+WebSocket Session B
+   ↓
+ChatSession Object B
+```
+
+The same bean instance remains associated with that WebSocket session during its lifetime.
+
+### 🔹 WebSocket Bean Lifecycle
+
+```text
+Client connects
+      ↓
+WebSocket Session Starts
+      ↓
+WebSocket-scoped Bean available
+      ↓
+Message 1
+      ↓
+Message 2
+      ↓
+Message 3
+      ↓
+Connection closes
+      ↓
+WebSocket Session Ends
+      ↓
+Bean lifecycle ends
+```
+
+### 🧠 Compare All the Web Scopes
+
+```text
+HTTP Request
+     ↓
+@RequestScope
+     ↓
+One object per HTTP request
+```
+
+```text
+HTTP Session
+     ↓
+@SessionScope
+     ↓
+One object per HTTP session
+```
+
+```text
+Web Application
+     ↓
+@ApplicationScope
+     ↓
+One object per ServletContext
+```
+
+```text
+WebSocket Session
+     ↓
+WebSocket Scope
+     ↓
+One object per WebSocket session
+```
+
+### 🎤 What Should You Say in an Interview?
+
+> **WebSocket is a protocol used for persistent, bidirectional communication between a client and server. Unlike the normal HTTP request-response model, after a WebSocket connection is established, both the client and server can send messages over the same connection. It is useful for real-time applications such as chat, live notifications, dashboards, and tracking. In Spring, WebSocket scope associates a bean instance with a WebSocket session, so that instance remains available for the lifetime of that WebSocket session.**
+
+### 🧠 Very Simple Memory
+
+```text
+REST API
+
+Request
+   ↓
+Response
+   ↓
+Done
+```
+
+```text
+WebSocket
+
+Connect
+   ↓
+Keep Connection Open
+   ↕
+Client ↔ Server
+   ↕
+Many Messages
+   ↓
+Disconnect
+```
+
+> **In one line:** WebSocket is useful when the client and server need to communicate continuously in real time without creating a new HTTP request for every update.
+
+---
 
 <h3 id="sb_026">Spring Singleton vs Java Singleton</h3>
 
