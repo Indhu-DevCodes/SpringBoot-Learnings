@@ -8863,67 +8863,2213 @@ For REST APIs, instead of adding `@ResponseBody` to every method, we normally us
 
 <h3 id="sb_042">What is `@RestController`?</h3>
 
+`@RestController` is a Spring MVC annotation used to create **REST APIs**.
 
+It tells Spring that the return value of a controller method should be written directly to the **HTTP response body**, usually as JSON, instead of being treated as a view name.
+
+### 🔹 Example
+
+```java
+@RestController
+@RequestMapping("/users")
+public class UserController {
+
+    @GetMapping("/{id}")
+    public User getUser(@PathVariable Long id) {
+
+        return new User(id, "Indhu");
+    }
+}
+```
+
+The response can be:
+
+```json
+{
+  "id": 1,
+  "name": "Indhu"
+}
+```
+
+Flow:
+
+```text
+Client
+  ↓
+GET /users/1
+  ↓
+@RestController
+  ↓
+Java Object
+  ↓
+Converted to JSON
+  ↓
+HTTP Response
+```
+
+### 🔹 What Does `@RestController` Contain?
+
+Conceptually:
+
+```java
+@RestController
+```
+
+is equivalent to using:
+
+```java
+@Controller
+@ResponseBody
+```
+
+So instead of writing:
+
+```java
+@Controller
+public class UserController {
+
+    @ResponseBody
+    @GetMapping("/users")
+    public List<User> getUsers() {
+        return userService.getUsers();
+    }
+}
+```
+
+we can simply write:
+
+```java
+@RestController
+public class UserController {
+
+    @GetMapping("/users")
+    public List<User> getUsers() {
+        return userService.getUsers();
+    }
+}
+```
+
+### 🎤 Interview-Ready Answer
+
+> **`@RestController` is used to create REST APIs in Spring. It combines `@Controller` and `@ResponseBody`, so the return value of controller methods is written directly to the HTTP response body instead of being interpreted as a view name. Java objects returned from the methods are typically converted to JSON using an HTTP message converter such as Jackson.**
+
+---
 
 <h3 id="sb_043">`@Controller` vs `@RestController`</h3>
 
+The main difference is **what the controller returns to the client**.
 
+| `@Controller` | `@RestController` |
+|---|---|
+| Mainly used for Spring MVC web pages | Mainly used for REST APIs |
+| Usually returns a view name | Returns data directly in the response body |
+| Needs `@ResponseBody` to return JSON/data directly | `@ResponseBody` behavior is already included |
+| Common with Thymeleaf/JSP | Common with JSON REST APIs |
+
+### 🔹 `@Controller` Example
+
+```java
+@Controller
+public class UserController {
+
+    @GetMapping("/users")
+    public String users() {
+        return "users";
+    }
+}
+```
+
+Here:
+
+```java
+return "users";
+```
+
+means Spring looks for a view such as:
+
+```text
+users.html
+```
+
+Flow:
+
+```text
+GET /users
+    ↓
+@Controller
+    ↓
+return "users"
+    ↓
+users.html
+    ↓
+HTML Page
+```
+
+### 🔹 `@RestController` Example
+
+```java
+@RestController
+public class UserController {
+
+    @GetMapping("/users")
+    public List<User> users() {
+        return userService.getUsers();
+    }
+}
+```
+
+Here the returned Java object/list is written to the HTTP response, typically as JSON:
+
+```json
+[
+  {
+    "id": 1,
+    "name": "Indhu"
+  }
+]
+```
+
+Flow:
+
+```text
+GET /users
+    ↓
+@RestController
+    ↓
+Java Object
+    ↓
+JSON
+    ↓
+HTTP Response
+```
+
+### 🔹 Important Point
+
+```java
+@RestController
+```
+
+is effectively:
+
+```java
+@Controller
++
+@ResponseBody
+```
+
+So with `@Controller`, if we want REST-style response data:
+
+```java
+@Controller
+public class UserController {
+
+    @GetMapping("/users")
+    @ResponseBody
+    public List<User> users() {
+        return userService.getUsers();
+    }
+}
+```
+
+Instead, for REST APIs we normally use:
+
+```java
+@RestController
+```
+
+### 🎤 Interview-Ready Answer
+
+> **`@Controller` is mainly used in Spring MVC applications where controller methods return view names for rendering pages such as Thymeleaf or JSP templates. `@RestController` is used for REST APIs, where the method return value is written directly to the HTTP response body, usually as JSON. `@RestController` effectively combines `@Controller` and `@ResponseBody`.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+@Controller
+     ↓
+View / HTML Page
+
+
+@RestController
+     ↓
+Response Body / JSON
+```
+
+---
 
 <h3 id="sb_044">`@Component` vs `@Bean`</h3>
 
+Both `@Component` and `@Bean` are used to register objects as **Spring Beans**, but they are used in different ways.
 
+### 🔹 `@Component`
+
+`@Component` is placed **on a class**.
+
+Spring automatically finds the class during **component scanning** and creates a Bean for it.
+
+```java
+@Component
+public class EmailService {
+
+}
+```
+
+Flow:
+
+```text
+@Component
+     ↓
+Component Scanning
+     ↓
+Spring discovers class
+     ↓
+Creates Bean automatically
+```
+
+### When to use
+
+Use `@Component` when:
+
+- You own the class
+- You can add Spring annotations to it
+- You want Spring to discover it automatically
+
+Example:
+
+```java
+@Component
+public class OrderMapper {
+}
+```
+
+### 🔹 `@Bean`
+
+`@Bean` is placed **on a method**, normally inside a `@Configuration` class.
+
+We explicitly create and configure the object, and Spring manages the returned object as a Bean.
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public PaymentClient paymentClient() {
+        return new PaymentClient();
+    }
+}
+```
+
+Flow:
+
+```text
+@Bean method
+     ↓
+Method creates object
+     ↓
+Returns object
+     ↓
+Spring registers and manages it
+```
+
+### When to use
+
+`@Bean` is especially useful when:
+
+- We need custom object creation/configuration
+- The class comes from a third-party library
+- We cannot modify the original class to add `@Component`
+
+For example:
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        // custom configuration
+
+        return mapper;
+    }
+}
+```
+
+We don't need to modify the `ObjectMapper` class itself.
+
+### 📊 Main Difference
+
+| `@Component` | `@Bean` |
+|---|---|
+| Applied to a class | Applied to a method |
+| Bean detected automatically through component scanning | Bean registered explicitly through configuration |
+| Spring creates the object based on the component definition | We control how the object is constructed/configured |
+| Good for our application classes | Very useful for third-party classes or custom configuration |
+| Less explicit creation logic | More control over creation |
+
+### 🔥 Easy Example
+
+For our own service:
+
+```java
+@Component
+public class EmailService {
+}
+```
+
+For an external/custom-configured object:
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public PaymentClient paymentClient() {
+        return new PaymentClient("api-key");
+    }
+}
+```
+
+Remember:
+
+```text
+@Component
+     ↓
+"Spring, discover this class."
+
+
+@Bean
+     ↓
+"Spring, manage this object that I explicitly create/configure."
+```
+
+### 🎤 Interview-Ready Answer
+
+> **Both `@Component` and `@Bean` register objects with the Spring Container. `@Component` is a class-level annotation where Spring automatically discovers the class through component scanning. `@Bean` is a method-level annotation, usually used inside a configuration class, where we explicitly create and configure the object that Spring should manage. I normally use component stereotypes for application classes I control, and `@Bean` when I need custom object creation or when configuring third-party classes that I cannot annotate directly.**
+
+---
 
 <h3 id="sb_045">Why do we have `@Service` if `@Component` can do the same thing?</h3>
 
+`@Service` is a specialized form of `@Component`.
+
+Technically, both annotations make a class eligible to become a Spring Bean through component scanning.
+
+The main reason we use `@Service` is to **clearly indicate that the class belongs to the business/service layer**.
+
+### 🔹 Example
+
+Both of these can be detected by Spring:
+
+```java
+@Component
+public class OrderService {
+}
+```
+
+and:
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+Both can become Spring-managed Beans.
+
+However, this:
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+clearly tells another developer:
+
+> **This class contains service/business logic.**
+
+### 🔹 Why Prefer `@Service` for Service Classes?
+
+It makes the application architecture easier to understand.
+
+```text
+@Controller
+     ↓
+Web / Controller Layer
+
+@Service
+     ↓
+Business / Service Layer
+
+@Repository
+     ↓
+Persistence / Database Layer
+
+@Component
+     ↓
+General Spring Component
+```
+
+For example:
+
+```java
+@Service
+public class OrderService {
+
+    public void createOrder(Order order) {
+        // Business logic
+    }
+}
+```
+
+Using `@Service` communicates the purpose of the class better than the generic `@Component`.
+
+### 🎤 Interview-Ready Answer
+
+> **`@Service` is a specialized stereotype of `@Component`. Technically, both allow Spring to detect and manage the class as a Bean. We use `@Service` for service-layer classes because it clearly expresses the role of the class and makes the application architecture more readable and maintainable. `@Component` is more appropriate for generic Spring-managed classes that do not belong to a specific layer.**
+
+### 🧠 Easy to Remember
+
+```text
+@Component
+     ↓
+Generic Spring Bean
+
+
+@Service
+     ↓
+Spring Bean specifically representing
+business/service logic
+```
+
+---
 
 
 <h3 id="sb_046">What special behavior does `@Repository` provide?</h3>
 
+The special behavior of `@Repository` is **Persistence Exception Translation**.
 
+It means Spring can convert supported persistence-specific exceptions into Spring's common `DataAccessException` hierarchy.
+
+### 🔹 Clear Example
+
+Suppose we have a repository that saves an employee:
+
+```java
+@Repository
+public class EmployeeRepository {
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public void save(Employee employee) {
+        entityManager.persist(employee);
+    }
+}
+```
+
+Assume the database has a unique constraint on:
+
+```text
+employee.email
+```
+
+Existing record:
+
+```text
+id = 1
+email = "indhu@gmail.com"
+```
+
+Now we try to insert another employee with the same email:
+
+```text
+id = 2
+email = "indhu@gmail.com"
+```
+
+The database rejects the operation.
+
+### ❌ Without Spring Exception Translation
+
+The persistence technology might throw its own exception.
+
+Conceptually:
+
+```text
+Duplicate Email
+      ↓
+Database constraint violation
+      ↓
+Hibernate / JPA specific exception
+```
+
+Now higher layers could become dependent on persistence-specific exception classes.
+
+### ✅ With `@Repository`
+
+Spring can translate supported persistence exceptions into its common exception hierarchy.
+
+```text
+Duplicate Email
+      ↓
+Database Constraint Violation
+      ↓
+Hibernate / JPA Exception
+      ↓
+Spring Exception Translation
+      ↓
+DataAccessException
+      ↓
+For example:
+DataIntegrityViolationException
+```
+
+For this type of constraint violation, application code may see a Spring exception such as:
+
+```java
+DataIntegrityViolationException
+```
+
+instead of needing to work directly with a Hibernate-specific exception.
+
+### 🔹 Service Example
+
+```java
+@Service
+public class EmployeeService {
+
+    private final EmployeeRepository employeeRepository;
+
+    public EmployeeService(
+            EmployeeRepository employeeRepository) {
+
+        this.employeeRepository = employeeRepository;
+    }
+
+    public void createEmployee(Employee employee) {
+
+        try {
+
+            employeeRepository.save(employee);
+
+        } catch (DataIntegrityViolationException ex) {
+
+            throw new DuplicateEmailException(
+                    "Email already exists"
+            );
+        }
+    }
+}
+```
+
+Now the service deals with a Spring data-access exception instead of depending directly on Hibernate's internal exception types.
+
+### 🔥 Why Is This Useful?
+
+Suppose today we use:
+
+```text
+Hibernate
+```
+
+Later we change the persistence implementation.
+
+Without exception translation:
+
+```text
+Service
+   ↓
+Hibernate-specific exception
+```
+
+Our service could become tied to Hibernate.
+
+With Spring's exception translation:
+
+```text
+Persistence Technology
+        ↓
+@Repository
+        ↓
+Spring Exception Translation
+        ↓
+DataAccessException hierarchy
+        ↓
+Service
+```
+
+The higher layers have a more consistent exception model.
+
+### 🎤 Interview-Ready Answer
+
+> **`@Repository` identifies a class as part of the persistence layer, but its important additional behavior is persistence exception translation. Spring can translate supported persistence-specific exceptions, such as Hibernate or JPA exceptions, into its common `DataAccessException` hierarchy. For example, a database constraint violation may be exposed as `DataIntegrityViolationException`. This gives the application a consistent exception model and reduces direct dependency on persistence-provider-specific exceptions.**
+
+### 🧠 Easy to Remember
+
+```text
+Database Error
+      ↓
+Hibernate / JPA Exception
+      ↓
+@Repository
+      ↓
+Spring Exception Translation
+      ↓
+DataAccessException
+```
+
+---
 
 <h3 id="sb_047">What is Component Scanning?</h3>
 
+**Component Scanning is the process Spring uses to automatically search specified packages for classes annotated with Spring stereotype annotations and register them as Spring Beans.**
 
+Spring mainly looks for annotations such as:
+
+```text
+@Component
+@Service
+@Repository
+@Controller
+@RestController
+```
+
+---
+
+## 🔹 Clear Example
+
+Suppose our project structure is:
+
+```text
+com.example.shop
+│
+├── ShopApplication.java
+│
+├── controller
+│   └── OrderController.java
+│
+├── service
+│   └── OrderService.java
+│
+└── repository
+    └── OrderRepository.java
+```
+
+### Service
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+### Controller
+
+```java
+@RestController
+public class OrderController {
+}
+```
+
+When the application starts, Spring scans the packages:
+
+```text
+com.example.shop
+        ↓
+controller
+service
+repository
+        ↓
+Find stereotype annotations
+        ↓
+Register matching classes as Beans
+```
+
+So Spring automatically creates and manages beans such as:
+
+```text
+OrderController
+OrderService
+```
+
+---
+
+## 🔹 Where Does Scanning Start in Spring Boot?
+
+Normally, the main class contains:
+
+```java
+@SpringBootApplication
+public class ShopApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(
+                ShopApplication.class,
+                args
+        );
+    }
+}
+```
+
+`@SpringBootApplication` includes component-scanning behavior.
+
+By default, Spring Boot scans from the package containing the main application class and its subpackages.
+
+Therefore, placing the main class near the root package is important.
+
+```text
+com.example.shop
+       │
+       ├── ShopApplication ✅
+       ├── controller      ✅ scanned
+       ├── service         ✅ scanned
+       └── repository      ✅ scanned
+```
+
+---
+
+## ⚠️ What If a Class Is Outside the Scanned Package?
+
+Suppose:
+
+```text
+com.example.shop
+│
+└── ShopApplication.java
+
+com.payment
+│
+└── PaymentService.java
+```
+
+and:
+
+```java
+@Service
+public class PaymentService {
+}
+```
+
+Even though `PaymentService` has `@Service`, it may not be discovered by the default scan because it is outside the package hierarchy starting at:
+
+```text
+com.example.shop
+```
+
+We can explicitly configure scanning when necessary, for example:
+
+```java
+@ComponentScan({
+    "com.example.shop",
+    "com.payment"
+})
+```
+
+### 🔹 Type-Safe Alternative
+
+Instead of writing package names as Strings:
+
+```java
+@ComponentScan("com.example.payment")
+```
+
+we can use:
+
+```java
+@ComponentScan(
+    basePackageClasses = PaymentService.class
+)
+```
+
+Spring scans the package containing `PaymentService` and its subpackages.
+
+This can be safer during package refactoring because we are using a class reference instead of a hard-coded package String.
+
+### 🎤 Interview-Ready Answer
+
+> **Component Scanning is the mechanism Spring uses to search configured packages for classes annotated with stereotypes such as `@Component`, `@Service`, `@Repository`, and `@Controller`, and automatically register them as Spring Beans. In Spring Boot, component scanning normally starts from the package containing the `@SpringBootApplication` class and scans its subpackages. That's why we generally keep the main application class in the root package of the project.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+Package
+   ↓
+Component Scanning
+   ↓
+Find @Component / @Service / @Repository / @Controller
+   ↓
+Register Bean Definitions
+   ↓
+Spring manages the Beans
+```
+
+---
 
 <h3 id="sb_048">How does `@ComponentScan` work?</h3>
 
-
+ **`@ComponentScan` tells Spring which packages should be searched for component classes. Spring scans those packages and their subpackages for stereotype annotations such as `@Component`, `@Service`, `@Repository`, and `@Controller`, creates BeanDefinitions for the detected components, and registers them with the Spring Container. In Spring Boot, component scanning is included through `@SpringBootApplication`, and by default it starts from the package containing the main application class and scans its subpackages.**
 
 <h3 id="sb_049">What happens if a component is outside the base package?</h3>
 
+If a component is outside the package being scanned by Spring, **Spring will not detect it and will not register it as a Bean**.
 
+### 🔹 Example
+
+Suppose the main class is:
+
+```text
+com.example.shop
+└── ShopApplication.java
+```
+
+But `PaymentService` is:
+
+```text
+com.payment
+└── PaymentService.java
+```
+
+```java
+@Service
+public class PaymentService {
+}
+```
+
+Even though `PaymentService` has `@Service`, it is outside the default scanning path.
+
+If another service tries to inject it:
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+the application can fail during startup because Spring cannot find a `PaymentService` Bean.
+
+You may see an error similar to:
+
+```text
+required a bean of type 'PaymentService'
+that could not be found
+```
+
+### ✅ How to Fix It
+
+### Option 1: Keep Classes Under the Root Package
+
+Preferred project structure:
+
+```text
+com.example.shop
+│
+├── ShopApplication.java
+├── controller
+├── service
+│   └── PaymentService.java
+└── repository
+```
+
+### Option 2: Explicitly Configure Scanning
+
+If the package must remain separate:
+
+```java
+@SpringBootApplication
+@ComponentScan({
+    "com.example.shop",
+    "com.payment"
+})
+public class ShopApplication {
+}
+```
+
+Now Spring scans both package hierarchies.
+
+### 🎤 Interview-Ready Answer
+
+> **If a component is outside Spring's configured component-scan packages, Spring will not detect or register it as a Bean. If another Bean depends on that component, application startup can fail with an unsatisfied dependency or missing-bean error. I would normally keep application components under the root package of the Spring Boot application, or explicitly include the additional package in component scanning when necessary.**
+
+---
 
 <h3 id="sb_050">What are Spring configuration approaches?</h3>
 
+Spring provides **three main approaches** to configure Beans and their dependencies:
 
+1. **XML-based Configuration**
+2. **Java-based Configuration**
+3. **Annotation-based Configuration**
+
+### 1️⃣ XML-based Configuration
+
+Bean definitions are written in an XML configuration file.
+
+```xml
+<bean id="paymentService"
+      class="com.example.PaymentService" />
+
+<bean id="orderService"
+      class="com.example.OrderService">
+
+    <constructor-arg ref="paymentService" />
+
+</bean>
+```
+
+Spring reads this XML file and creates the configured Beans.
+
+### When is it used?
+
+XML configuration is mainly found in:
+
+- Older Spring applications
+- Legacy enterprise projects
+- Applications where configuration was intentionally kept outside Java classes
+
+Modern Spring Boot applications rarely use XML for normal Bean configuration.
+
+### 2️⃣ Java-based Configuration
+
+Beans are explicitly configured using Java classes with:
+
+```java
+@Configuration
+@Bean
+```
+
+Example:
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public PaymentService paymentService() {
+        return new PaymentService();
+    }
+
+    @Bean
+    public OrderService orderService(
+            PaymentService paymentService) {
+
+        return new OrderService(paymentService);
+    }
+}
+```
+
+Here, we explicitly control how the objects are created and configured.
+
+### When is it useful?
+
+Java configuration is useful when:
+
+- We need custom Bean creation
+- We need to configure third-party classes
+- Bean creation requires additional settings or logic
+
+### 3️⃣ Annotation-based Configuration
+
+Spring Beans are identified using annotations directly on classes.
+
+Example:
+
+```java
+@Service
+public class PaymentService {
+}
+```
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Spring discovers these classes through component scanning.
+
+Common annotations include:
+
+```text
+@Component
+@Service
+@Repository
+@Controller
+@RestController
+@Autowired
+@Qualifier
+@Value
+```
+
+This approach is commonly used in Spring Boot applications.
+
+### 🔥 What Do We Usually Use in Spring Boot?
+
+Modern Spring Boot applications commonly use a **combination of Annotation-based and Java-based configuration**.
+
+For our own application classes:
+
+```java
+@Service
+@Repository
+@RestController
+```
+
+For objects requiring explicit configuration:
+
+```java
+@Configuration
+@Bean
+```
+
+Example:
+
+```text
+Our Service Classes
+       ↓
+@Service
+
+
+Our Repository Classes
+       ↓
+@Repository
+
+
+Custom / Third-Party Objects
+       ↓
+@Configuration + @Bean
+```
+
+### 📊 Quick Comparison
+
+| Approach | Configuration Location | Common Usage |
+|---|---|---|
+| XML | XML file | Legacy applications |
+| Java-based | `@Configuration` + `@Bean` | Explicit/custom Bean configuration |
+| Annotation-based | Annotations on classes | Most application components |
+
+### 🎤 Interview-Ready Answer
+
+> **Spring supports XML-based, Java-based, and annotation-based configuration. XML configuration defines Beans in XML files and is mostly seen in legacy applications. Java-based configuration uses `@Configuration` and `@Bean`, which is useful when we need explicit control over Bean creation or need to configure third-party classes. Annotation-based configuration uses stereotypes such as `@Component`, `@Service`, and `@Repository`, which Spring discovers through component scanning. In Spring Boot projects, we normally use annotation-based configuration for our application components and Java-based configuration where explicit Bean configuration is required.**
+
+---
 
 <h3 id="sb_051">XML Configuration</h3>
 
+**XML-based Configuration is a traditional Spring configuration approach where we define Spring Beans and their dependencies inside an XML file instead of using annotations or Java configuration.**
 
+Spring reads the XML file and uses the configuration to create and wire the required Beans.
+
+### 🔹 Simple Example
+
+Suppose we have two normal Java classes:
+
+```java
+public class PaymentService {
+
+}
+```
+
+```java
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Neither class contains Spring annotations.
+
+We can configure them in an XML file:
+
+```xml
+<beans>
+
+    <bean id="paymentService"
+          class="com.example.PaymentService" />
+
+    <bean id="orderService"
+          class="com.example.OrderService">
+
+        <constructor-arg ref="paymentService" />
+
+    </bean>
+
+</beans>
+```
+
+### 🔹 What Does This XML Mean?
+
+This:
+
+```xml
+<bean id="paymentService"
+      class="com.example.PaymentService" />
+```
+
+tells Spring:
+
+```text
+Create a PaymentService Bean
+        ↓
+Bean name = paymentService
+```
+
+And:
+
+```xml
+<bean id="orderService"
+      class="com.example.OrderService">
+
+    <constructor-arg ref="paymentService" />
+
+</bean>
+```
+
+tells Spring:
+
+```text
+Create OrderService
+        ↓
+Find paymentService Bean
+        ↓
+Pass it to OrderService constructor
+```
+
+So the final relationship is:
+
+```text
+PaymentService Bean
+        ↓
+Injected into
+        ↓
+OrderService Bean
+```
+
+---
+
+## 🔹 Loading the XML Configuration
+
+The XML configuration can be loaded into a Spring container:
+
+```java
+ApplicationContext context =
+        new ClassPathXmlApplicationContext(
+                "applicationContext.xml"
+        );
+```
+
+Spring then reads the XML and creates the configured Beans.
+
+---
+
+## 🔹 When Is XML Configuration Used?
+
+XML configuration is mainly seen in:
+
+```text
+Older Spring applications
+Legacy enterprise projects
+Existing applications that already use XML extensively
+```
+
+Modern Spring Boot applications generally prefer:
+
+```text
+Annotations
+       +
+Java Configuration
+```
+
+such as:
+
+```java
+@Service
+```
+
+and:
+
+```java
+@Configuration
+@Bean
+```
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **XML-based configuration is a traditional Spring configuration approach where Bean definitions and their dependencies are declared in an XML file. Spring reads the XML configuration, creates the specified Beans, and wires their dependencies. It was widely used in older Spring applications, but modern Spring Boot applications generally prefer annotation-based and Java-based configuration because they are easier to maintain and provide better type safety.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+XML File
+   ↓
+Define Beans
+   ↓
+Define Dependencies
+   ↓
+Spring reads XML
+   ↓
+Creates and wires Beans
+```
+
+---
 
 <h3 id="sb_052">Java Configuration</h3>
 
+# 🟢 Q52. What is Java-based Configuration?
 
+**Java-based Configuration is a Spring configuration approach where we define and configure Spring Beans using Java classes instead of XML files.**
+
+It mainly uses:
+
+```java
+@Configuration
+```
+
+and:
+
+```java
+@Bean
+```
+
+---
+
+## 🔹 Simple Example
+
+Suppose we have:
+
+```java
+public class PaymentService {
+}
+```
+
+Instead of defining the bean in XML, we can configure it using Java:
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public PaymentService paymentService() {
+        return new PaymentService();
+    }
+}
+```
+
+Here:
+
+```java
+@Configuration
+```
+
+tells Spring:
+
+> This class contains Spring configuration.
+
+And:
+
+```java
+@Bean
+```
+
+tells Spring:
+
+> Manage the object returned by this method as a Spring Bean.
+
+---
+
+## 🔹 Configuring Dependencies
+
+Suppose `OrderService` requires `PaymentService`.
+
+```java
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Configuration:
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public PaymentService paymentService() {
+        return new PaymentService();
+    }
+
+    @Bean
+    public OrderService orderService(
+            PaymentService paymentService) {
+
+        return new OrderService(paymentService);
+    }
+}
+```
+
+Spring resolves the dependency:
+
+```text
+PaymentService Bean
+        ↓
+Injected into
+        ↓
+OrderService Bean
+```
+
+---
+
+## 🔹 When Do We Use Java-based Configuration?
+
+It is especially useful when:
+
+- We need explicit control over Bean creation
+- A Bean requires custom configuration
+- We are configuring a third-party library
+- We cannot add Spring annotations to the original class
+
+For example, configuring a third-party client:
+
+```java
+@Configuration
+public class ClientConfig {
+
+    @Bean
+    public PaymentClient paymentClient() {
+
+        PaymentClient client =
+                new PaymentClient();
+
+        client.setTimeout(5000);
+
+        return client;
+    }
+}
+```
+
+Spring now manages the configured `PaymentClient` object.
+
+---
+
+## ✅ Advantages
+
+Java-based configuration provides:
+
+```text
+Type Safety
+    +
+IDE Support
+    +
+Refactoring Support
+    +
+Explicit Bean Configuration
+```
+
+Unlike XML, configuration is written as normal Java code, so many errors can be detected during compilation.
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **Java-based Configuration is an approach where Spring Beans are defined using Java classes instead of XML. We normally use `@Configuration` to mark a configuration class and `@Bean` to register objects with the Spring Container. It is useful when we need explicit control over Bean creation or when configuring third-party classes. In modern Spring Boot applications, Java-based configuration is commonly used together with annotation-based configuration.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+@Configuration
+      ↓
+Configuration Class
+
+@Bean
+      ↓
+Create / Configure Object
+      ↓
+Spring Manages It
+```
+
+---
 
 <h3 id="sb_053">Annotation Configuration</h3>
 
+# 🟢 Q53. What is Annotation-based Configuration?
 
+**Annotation-based Configuration means configuring Spring Beans and their dependencies using annotations directly in Java classes instead of defining them in XML files.**
+
+Common annotations include:
+
+```text
+@Component
+@Service
+@Repository
+@Controller
+@RestController
+@Autowired
+@Qualifier
+@Primary
+@Value
+```
+
+---
+
+## 🔹 Simple Example
+
+```java
+@Service
+public class PaymentService {
+
+    public void processPayment() {
+        System.out.println("Payment processed");
+    }
+}
+```
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Spring detects these classes and manages them as Beans.
+
+```text
+@Service
+    ↓
+Spring detects the class
+    ↓
+Registers it as a Bean
+    ↓
+Creates the Bean
+    ↓
+Injects required dependencies
+```
+
+---
+
+## 🔹 Why Do We Use Annotation-based Configuration?
+
+Instead of writing Bean configuration separately in XML:
+
+```xml
+<bean id="paymentService"
+      class="com.example.PaymentService" />
+```
+
+we can declare the role directly on the class:
+
+```java
+@Service
+public class PaymentService {
+}
+```
+
+This keeps the configuration closer to the application code.
+
+---
+
+## 🔹 Common Annotations
+
+```java
+@Component
+```
+
+Used for general Spring-managed components.
+
+```java
+@Service
+```
+
+Used for service/business-layer classes.
+
+```java
+@Repository
+```
+
+Used for persistence-layer classes.
+
+```java
+@Controller
+@RestController
+```
+
+Used for web/controller classes.
+
+Annotations such as these work together with component scanning to register application components.
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **Annotation-based Configuration is a Spring configuration approach where annotations are used directly on Java classes to define components and their dependencies instead of configuring them in XML. For example, we use `@Service`, `@Repository`, `@Controller`, and `@Component` to identify Spring-managed components, and Spring discovers them through component scanning. This approach is widely used in Spring Boot because it keeps configuration close to the code and reduces XML configuration.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+Java Class
+    ↓
+Spring Annotation
+    ↓
+Component Scanning
+    ↓
+Spring Bean
+```
 
 <h3 id="sb_054">What is `@Configuration`?</h3>
 
+# 🟢 Q54. What is `@Configuration`?
 
+`@Configuration` tells Spring that a class is a **configuration class that contains instructions for creating/configuring Spring Beans**.
+
+### Example
+
+```java
+@Configuration
+public class PaymentConfig {
+
+    @Bean
+    public PaymentClient paymentClient() {
+        return new PaymentClient();
+    }
+}
+```
+
+Here:
+
+```text
+PaymentConfig
+     ↓
+@Configuration
+     ↓
+"This class contains Spring configuration"
+```
+
+Spring processes this class during application startup.
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **`@Configuration` is used to mark a Java class as a Spring configuration class. Such a class can contain Bean definitions, commonly through `@Bean` methods. I use it when I want to configure application infrastructure or explicitly control how certain objects are created and configured.**
+
+### 🧠 One-Line Memory
+
+```text
+@Configuration = Class containing Spring configuration
+```
+
+---
 
 <h3 id="sb_055">What is `@Bean`?</h3>
 
+# 🟢 Q55. What is `@Bean`?
 
+`@Bean` is a Spring annotation used on a **method** to tell Spring:
+
+> **The object returned by this method should be registered and managed as a Spring Bean.**
+
+---
+
+## 🔹 Example
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public PaymentClient paymentClient() {
+        return new PaymentClient();
+    }
+}
+```
+
+Here:
+
+```java
+public PaymentClient paymentClient() {
+    return new PaymentClient();
+}
+```
+
+creates a normal Java object.
+
+But because the method has:
+
+```java
+@Bean
+```
+
+Spring takes the returned object and manages it as a Bean.
+
+```text
+@Bean method called
+      ↓
+PaymentClient object created
+      ↓
+Object registered with Spring
+      ↓
+PaymentClient becomes a Spring Bean
+```
+
+---
+
+## 🔹 Why Do We Use `@Bean`?
+
+`@Bean` is useful when **we want to control how an object is created or configured**.
+
+For example:
+
+```java
+@Bean
+public PaymentClient paymentClient() {
+
+    PaymentClient client = new PaymentClient();
+
+    client.setTimeout(5000);
+    client.setRetryCount(3);
+
+    return client;
+}
+```
+
+Here we control exactly how `PaymentClient` is configured before Spring manages it.
+
+It is especially useful for **third-party classes** where we cannot add annotations such as `@Component`.
+
+---
+
+## 🔹 Bean Name
+
+By default, the method name becomes the Bean name.
+
+```java
+@Bean
+public PaymentClient paymentClient() {
+    return new PaymentClient();
+}
+```
+
+Bean name:
+
+```text
+paymentClient
+```
+
+We can also provide a custom name:
+
+```java
+@Bean("stripePaymentClient")
+public PaymentClient paymentClient() {
+    return new PaymentClient();
+}
+```
+
+Bean name:
+
+```text
+stripePaymentClient
+```
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **`@Bean` is a method-level annotation used to explicitly register an object with the Spring Container. Spring manages the object returned by the method as a Bean. I use `@Bean` when I need explicit control over object creation or configuration, especially for third-party classes that I cannot annotate with Spring stereotypes. By default, the method name is used as the Bean name.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+@Bean
+   ↓
+Method creates object
+   ↓
+Returns object
+   ↓
+Spring manages that object
+```
+
+---
 
 <h3 id="sb_056">What is `@Import`?</h3>
 
+`@Import` is a Spring annotation used to **include another configuration class or component into the current Spring configuration**.
 
+In simple terms:
+
+> **`@Import` allows one configuration class to bring Bean definitions from another configuration class into the Spring Container.**
+
+### 🔹 Clear Example
+
+Suppose we separate configuration based on functionality.
+
+### Database Configuration
+
+```java
+@Configuration
+public class DatabaseConfig {
+
+    @Bean
+    public DataSource dataSource() {
+        return new DataSource();
+    }
+}
+```
+
+### Payment Configuration
+
+```java
+@Configuration
+public class PaymentConfig {
+
+    @Bean
+    public PaymentClient paymentClient() {
+        return new PaymentClient();
+    }
+}
+```
+
+Now we have a main configuration:
+
+```java
+@Configuration
+@Import({
+    DatabaseConfig.class,
+    PaymentConfig.class
+})
+public class AppConfig {
+
+}
+```
+
+Spring now includes the Bean definitions from both:
+
+```text
+AppConfig
+   ↓
+@Import
+   ↓
+   ├── DatabaseConfig
+   │       ↓
+   │   DataSource Bean
+   │
+   └── PaymentConfig
+           ↓
+       PaymentClient Bean
+```
+
+### 🔹 Why Do We Use `@Import`?
+
+It is useful when configuration becomes large and we want to **split it into smaller configuration classes**.
+
+Instead of:
+
+```text
+One Huge Configuration Class
+```
+
+we can organize it as:
+
+```text
+DatabaseConfig
+SecurityConfig
+PaymentConfig
+CacheConfig
+MessagingConfig
+```
+
+and combine the required configurations using:
+
+```java
+@Import
+```
+
+### 🎤 Interview-Ready Answer
+
+> **`@Import` is used to include additional configuration classes or components in the Spring configuration. I would use it when configuration is split into separate modules, such as database, payment, security, or caching configuration, and I want Spring to load those configurations together.**
+
+### 🧠 Easy to Remember
+
+```text
+@Import
+   ↓
+Bring another Spring configuration
+   ↓
+Include its Bean definitions
+```
+
+---
 
 <h3 id="sb_057">What is `@Value`?</h3>
 
+# 🟢 Q57. What is `@Value`?
 
+`@Value` is a Spring annotation used to **inject configuration values into a Spring Bean**.
+
+The values commonly come from:
+
+```text
+application.properties
+application.yml
+Environment variables
+System properties
+```
+
+---
+
+## 🔹 Simple Example
+
+Suppose `application.properties` contains:
+
+```properties
+payment.timeout=5000
+payment.url=https://payment.example.com
+```
+
+We can inject these values:
+
+```java
+@Component
+public class PaymentConfig {
+
+    @Value("${payment.timeout}")
+    private int timeout;
+
+    @Value("${payment.url}")
+    private String paymentUrl;
+}
+```
+
+Spring resolves:
+
+```text
+${payment.timeout}
+        ↓
+5000
+```
+
+and:
+
+```text
+${payment.url}
+        ↓
+https://payment.example.com
+```
+
+---
+
+## 🔹 Default Value
+
+We can provide a default value:
+
+```java
+@Value("${payment.timeout:3000}")
+private int timeout;
+```
+
+If:
+
+```properties
+payment.timeout
+```
+
+is not configured, Spring uses:
+
+```text
+3000
+```
+
+The syntax is:
+
+```text
+${property-name:default-value}
+```
+
+---
+
+## 🔹 Constructor Injection with `@Value`
+
+Instead of field injection, configuration values can also be passed through a constructor:
+
+```java
+@Service
+public class PaymentService {
+
+    private final int timeout;
+
+    public PaymentService(
+            @Value("${payment.timeout:3000}")
+            int timeout) {
+
+        this.timeout = timeout;
+    }
+}
+```
+
+This makes the configuration dependency explicit.
+
+---
+
+## 🔹 `@Value` Can Also Use SpEL
+
+`@Value` can evaluate Spring Expression Language expressions.
+
+Example:
+
+```java
+@Value("#{10 * 5}")
+private int value;
+```
+
+Result:
+
+```text
+50
+```
+
+We'll cover SpEL separately later.
+
+---
+
+## ⚠️ Important Interview Point
+
+`@Value` is convenient for injecting a **small number of individual configuration properties**.
+
+If an application has many related properties such as:
+
+```properties
+payment.url=...
+payment.timeout=...
+payment.retry-count=...
+payment.username=...
+payment.region=...
+```
+
+we generally prefer:
+
+```java
+@ConfigurationProperties
+```
+
+because it groups related configuration into a structured object.
+
+# 🟢 `@ConfigurationProperties` Example
+
+`@ConfigurationProperties` is used to **map a group of related configuration properties into a Java object**.
+
+It is useful when we have multiple properties with the same prefix.
+
+---
+
+## 🔹 Example
+
+Suppose `application.properties` contains:
+
+```properties
+payment.url=https://payment.example.com
+payment.timeout=5000
+payment.retry-count=3
+payment.currency=INR
+```
+
+We can map all properties starting with:
+
+```text
+payment
+```
+
+into one Java class:
+
+```java
+@Component
+@ConfigurationProperties(prefix = "payment")
+public class PaymentProperties {
+
+    private String url;
+    private int timeout;
+    private int retryCount;
+    private String currency;
+
+    // getters and setters
+
+}
+```
+
+Spring automatically maps:
+
+```text
+payment.url
+      ↓
+url
+
+
+payment.timeout
+      ↓
+timeout
+
+
+payment.retry-count
+      ↓
+retryCount
+
+
+payment.currency
+      ↓
+currency
+```
+
+---
+
+## 🔹 Using It in a Service
+
+```java
+@Service
+public class PaymentService {
+
+    private final PaymentProperties paymentProperties;
+
+    public PaymentService(
+            PaymentProperties paymentProperties) {
+
+        this.paymentProperties = paymentProperties;
+    }
+
+    public void processPayment() {
+
+        System.out.println(
+                paymentProperties.getUrl()
+        );
+
+        System.out.println(
+                paymentProperties.getTimeout()
+        );
+    }
+}
+```
+
+Now the service does not need multiple `@Value` annotations.
+
+It receives one configuration object:
+
+```text
+PaymentService
+      ↓
+PaymentProperties
+      |
+      ├── url
+      ├── timeout
+      ├── retryCount
+      └── currency
+```
+
+---
+
+## 🔥 `@Value` vs `@ConfigurationProperties`
+
+For a few individual properties:
+
+```java
+@Value("${payment.timeout}")
+private int timeout;
+```
+
+For multiple related properties:
+
+```java
+@ConfigurationProperties(prefix = "payment")
+```
+
+Think:
+
+```text
+Few individual values
+        ↓
+@Value
+
+
+Group of related properties
+        ↓
+@ConfigurationProperties
+```
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **`@ConfigurationProperties` is used to bind a group of related external configuration properties to a Java object. For example, all properties starting with `payment` can be mapped into a `PaymentProperties` class. I prefer it over multiple `@Value` annotations when there are several related properties because it provides structured and type-safe configuration binding.**
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **`@Value` is used to inject external configuration values into Spring Beans. For example, I can inject a property from `application.properties` using `@Value("${payment.timeout}")`. It also supports default values and SpEL expressions. I normally use `@Value` for a small number of individual properties, while for a group of related configuration properties I prefer `@ConfigurationProperties`.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+application.properties
+
+payment.timeout=5000
+        ↓
+@Value("${payment.timeout}")
+        ↓
+5000
+```
+
+
+```text
+application.properties
+        ↓
+payment.*
+        ↓
+@ConfigurationProperties(prefix = "payment")
+        ↓
+PaymentProperties Object
+```
+
+---
 
 <h3 id="sb_058">What is `Environment`?</h3>
 
