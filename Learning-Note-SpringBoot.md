@@ -1,4 +1,4 @@
-<img width="828" height="2268" alt="image" src="https://github.com/user-attachments/assets/947d81c8-0f2a-4087-a6cc-b3362eb8cfa4" /># Spring & Spring Boot Interview Questions
+# Spring & Spring Boot Interview Questions
 
 ## 1. Core Spring Fundamentals
 1. [What is Spring Framework?](#sb_001)
@@ -6806,23 +6806,1266 @@ Disconnect
 
 <h3 id="sb_026">Spring Singleton vs Java Singleton</h3>
 
+Spring Singleton and the Java Singleton Design Pattern both often result in a single object being reused, but **their scope and object management are different**.
 
+### 🔹 Spring Singleton
+
+In Spring, `singleton` is a **bean scope**.
+
+Spring maintains **one bean instance per bean definition within a Spring IoC Container**.
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+Since `singleton` is the default scope, Spring manages one `OrderService` bean instance for that bean definition in that container.
+
+```text
+Spring Container
+      ↓
+orderService Bean Definition
+      ↓
+One OrderService Object
+      ↓
+Shared wherever that Bean is injected
+```
+
+We don't need to implement any special Singleton-pattern code.
+
+### 🔹 Java Singleton
+
+Java Singleton is a **design pattern implemented by the developer** to restrict normal construction and expose a single shared instance.
+
+A simple example:
+
+```java
+public class DatabaseManager {
+
+    private static final DatabaseManager INSTANCE =
+            new DatabaseManager();
+
+    private DatabaseManager() {
+    }
+
+    public static DatabaseManager getInstance() {
+        return INSTANCE;
+    }
+}
+```
+
+Usage:
+
+```java
+DatabaseManager manager1 =
+        DatabaseManager.getInstance();
+
+DatabaseManager manager2 =
+        DatabaseManager.getInstance();
+```
+
+Both references point to the same singleton instance:
+
+```text
+DatabaseManager
+      ↓
+static instance
+      ↓
+getInstance()
+      ↓
+Same Object
+```
+
+### 🔥 Main Difference
+
+| Spring Singleton | Java Singleton |
+|---|---|
+| Spring bean scope | Design pattern |
+| Managed by Spring Container | Managed through application/class design |
+| One instance per bean definition per Spring container | Typically one instance per class loader, depending on implementation |
+| Spring controls creation and lifecycle | Developer implements object-creation restriction |
+| No private constructor required | Usually uses a private constructor |
+| No `getInstance()` required | Commonly exposes `getInstance()` or similar mechanism |
+| Works naturally with Dependency Injection | Usually accessed explicitly through its singleton mechanism |
+
+### ⚠️ Important Difference
+
+Suppose an application has two independent Spring containers:
+
+```text
+ApplicationContext A
+       ↓
+OrderService Object A
+
+
+ApplicationContext B
+       ↓
+OrderService Object B
+```
+
+Both containers can have their **own singleton `OrderService` bean**.
+
+Therefore, Spring Singleton does **not** mean:
+
+```text
+Exactly one object in the entire JVM
+```
+
+It means:
+
+```text
+One bean instance
+        ↓
+per Bean Definition
+        ↓
+per Spring Container
+```
+
+### 🎤 Interview-Ready Answer
+
+> **Spring Singleton is a bean scope where Spring maintains one bean instance per bean definition within a Spring IoC container. Java Singleton, on the other hand, is a design pattern implemented by the developer, usually using a private constructor and a static instance to restrict object creation. So Spring Singleton is container-managed, while Java Singleton is class/design-pattern managed.**
+
+---
 
 <h3 id="sb_027">Can a Singleton Bean inject a Prototype Bean?</h3>
 
+**Yes. A Singleton Bean can inject a Prototype Bean.**
 
+However, there is an important behavior to understand:
+
+> If a Prototype Bean is directly injected into a Singleton Bean, the prototype instance is usually resolved when the Singleton Bean is created. Therefore, that Singleton Bean keeps using the **same injected prototype object**, rather than automatically receiving a new prototype object on every method call.
+
+
+## 🔹 Example
+
+```java
+@Component
+@Scope("prototype")
+public class ReportService {
+}
+```
+
+```java
+@Service
+public class OrderService {
+
+    private final ReportService reportService;
+
+    public OrderService(ReportService reportService) {
+        this.reportService = reportService;
+    }
+
+    public void generateReport() {
+        System.out.println(reportService);
+    }
+}
+```
+
+Here:
+
+```text
+OrderService
+     ↓
+Singleton
+
+ReportService
+     ↓
+Prototype
+```
+
+When Spring creates the singleton `OrderService`:
+
+```text
+Create OrderService
+       ↓
+OrderService needs ReportService
+       ↓
+Spring creates ReportService Object #1
+       ↓
+Injects it into OrderService
+       ↓
+OrderService keeps that reference
+```
+
+Later:
+
+```text
+generateReport() → ReportService Object #1
+
+generateReport() → ReportService Object #1
+
+generateReport() → ReportService Object #1
+```
+
+So simply injecting a prototype into a singleton does **not** mean a new prototype object appears on every method invocation.
+
+
+### 🔥 What if I need a new Prototype Bean every time?
+
+If you need:
+
+```text
+generateReport()
+      ↓
+New ReportService
+
+
+generateReport()
+      ↓
+Another new ReportService
+```
+
+you need to request the prototype dynamically.
+
+Spring provides approaches such as:
+
+- `ObjectProvider`
+- `@Lookup`
+
+For example:
+
+```java
+@Service
+public class OrderService {
+
+    private final ObjectProvider<ReportService> reportServiceProvider;
+
+    public OrderService(
+            ObjectProvider<ReportService> reportServiceProvider) {
+
+        this.reportServiceProvider = reportServiceProvider;
+    }
+
+    public void generateReport() {
+
+        ReportService reportService =
+                reportServiceProvider.getObject();
+
+        System.out.println(reportService);
+    }
+}
+```
+
+Now:
+
+```text
+generateReport()
+      ↓
+getObject()
+      ↓
+ReportService Object #1
+
+
+generateReport()
+      ↓
+getObject()
+      ↓
+ReportService Object #2
+```
+
+Because `ReportService` is prototype-scoped, each lookup asks Spring for a new instance.
+
+## 🎤 Interview-Ready Answer
+
+> **Yes, a singleton bean can depend on a prototype bean. However, if the prototype bean is injected directly through normal constructor injection, the prototype is resolved when the singleton is created, so that singleton keeps the same prototype instance. If I need a new prototype instance during each operation, I would perform a dynamic lookup using something like `ObjectProvider` or `@Lookup`.**
+
+### 🧠 Easy to Remember
+
+```text
+Prototype directly injected into Singleton
+              ↓
+Prototype created during Singleton creation
+              ↓
+Singleton keeps same reference
+
+
+Need new Prototype every time?
+              ↓
+Dynamic lookup
+              ↓
+ObjectProvider / @Lookup
+```
+
+---
 
 <h3 id="sb_028">What problem occurs when Prototype Bean is injected into Singleton?</h3>
 
+The main problem is a scope mismatch.
 
+When a prototype bean is directly injected into a singleton bean, Spring creates the prototype object while creating the singleton.
+
+The singleton then keeps that same prototype object.
+
+So we may expect a new prototype object every time, even if we expected a fresh prototype object for every operation. but we continue using the same one.
+
+### 🔹 Example
+
+Prototype bean:
+
+```java
+@Component
+@Scope("prototype")
+public class ReportService {
+
+    private List<String> data = new ArrayList<>();
+
+    public void addData(String value) {
+        data.add(value);
+    }
+
+    public List<String> getData() {
+        return data;
+    }
+}
+```
+
+Singleton bean:
+
+```java
+@Service
+public class OrderService {
+
+    private final ReportService reportService;
+
+    public OrderService(ReportService reportService) {
+        this.reportService = reportService;
+    }
+
+    public void generateReport(String order) {
+        reportService.addData(order);
+    }
+}
+```
+
+When Spring creates `OrderService`:
+
+```text
+Create Singleton OrderService
+           ↓
+Constructor needs ReportService
+           ↓
+Spring creates Prototype Object 1
+           ↓
+Injects Object 1 into OrderService
+           ↓
+OrderService keeps Object 1
+```
+
+### ⚠️ Where Does the Problem Come?
+
+Suppose User A calls:
+
+```java
+generateReport("Order-A");
+```
+
+The prototype object contains:
+
+```text
+["Order-A"]
+```
+
+Then User B calls:
+
+```java
+generateReport("Order-B");
+```
+
+Since the Singleton still holds the same `ReportService` object:
+
+```text
+["Order-A", "Order-B"]
+```
+
+But our expected behavior was:
+
+```text
+User A
+   ↓
+ReportService Object 1
+   ↓
+["Order-A"]
+
+
+User B
+   ↓
+ReportService Object 2
+   ↓
+["Order-B"]
+```
+
+Instead, we got:
+
+```text
+User A ───┐
+          ↓
+   ReportService Object 1
+          ↑
+User B ───┘
+          ↓
+["Order-A", "Order-B"]
+```
+
+So the state is unintentionally shared.
+
+### 🔥 Why Does This Happen?
+
+Prototype means:
+
+> **Spring creates a new object every time the Prototype Bean is requested from the Spring Container.**
+
+During normal constructor injection:
+
+```java
+public OrderService(ReportService reportService) {
+    this.reportService = reportService;
+}
+```
+
+Spring requests `ReportService` only once:
+
+```text
+Singleton Creation
+       ↓
+Request Prototype
+       ↓
+Create Object 1
+       ↓
+Inject Object 1
+```
+
+Later method calls:
+
+```java
+generateReport();
+generateReport();
+generateReport();
+```
+
+do not request another bean from Spring.
+
+They simply reuse:
+
+```java
+this.reportService
+```
+
+which still points to:
+
+```text
+ReportService Object 1
+```
+
+### ✅ How Do We Solve It?
+
+If we actually need a new Prototype Bean for each operation, the Singleton must request a new object from Spring each time.
+
+For example, using `ObjectProvider`:
+
+```java
+@Service
+public class OrderService {
+
+    private final ObjectProvider<ReportService> provider;
+
+    public OrderService(
+            ObjectProvider<ReportService> provider) {
+        this.provider = provider;
+    }
+
+    public void generateReport(String order) {
+
+        ReportService reportService =
+                provider.getObject();
+
+        reportService.addData(order);
+    }
+}
+```
+
+Now:
+
+```text
+Operation 1
+    ↓
+getObject()
+    ↓
+Prototype Object 1
+
+
+Operation 2
+    ↓
+getObject()
+    ↓
+Prototype Object 2
+
+
+Operation 3
+    ↓
+getObject()
+    ↓
+Prototype Object 3
+```
+
+Spring also provides approaches such as `@Lookup` for this requirement.
+
+### 🎤 Interview-Ready Answer
+
+> **When a Prototype Bean is directly injected into a Singleton Bean, the prototype is created only when the singleton is created. The singleton then keeps the same prototype reference. This becomes a problem when we expect a fresh prototype instance for every operation, especially if the prototype contains mutable state. In that situation, we can dynamically request a new prototype using `ObjectProvider`, `@Lookup`, or another appropriate scoped lookup mechanism.**
+---
 
 <h3 id="sb_029">What is `@Lookup`?</h3>
 
+`@Lookup` is a Spring annotation used when a bean needs to **get a fresh instance of another bean from the Spring Container whenever a method is called**.
 
+A common use case is:
+
+> **A Singleton Bean needs a new Prototype Bean for every operation.**
+
+### 🔹 Why Do We Need `@Lookup`?
+
+Suppose `ReportService` is Prototype scoped:
+
+```java
+@Component
+@Scope("prototype")
+public class ReportService {
+}
+```
+
+If we directly inject it into a Singleton:
+
+```java
+@Service
+public class OrderService {
+
+    private final ReportService reportService;
+
+    public OrderService(ReportService reportService) {
+        this.reportService = reportService;
+    }
+}
+```
+
+The prototype is resolved when the Singleton is created.
+
+So:
+
+```text
+OrderService Singleton
+        ↓
+ReportService Object 1
+        ↓
+Same object continues to be used
+```
+
+But suppose our requirement is:
+
+```text
+generateReport()
+       ↓
+ReportService Object 1
+
+
+generateReport()
+       ↓
+ReportService Object 2
+
+
+generateReport()
+       ↓
+ReportService Object 3
+```
+
+We need to ask Spring for a new Prototype Bean each time.
+
+This is where `@Lookup` can be used.
+
+### 🔹 Example Using `@Lookup`
+
+```java
+@Service
+public class OrderService {
+
+    public void generateReport() {
+
+        ReportService reportService =
+                getReportService();
+
+        System.out.println(reportService);
+    }
+
+    @Lookup
+    protected ReportService getReportService() {
+        return null;
+    }
+}
+```
+
+The method:
+
+```java
+getReportService();
+```
+
+is annotated with:
+
+```java
+@Lookup
+```
+
+Spring overrides this method at runtime and retrieves `ReportService` from the Spring Container.
+
+### 🔹 What Happens on Each Call?
+
+```text
+generateReport()
+       ↓
+getReportService()
+       ↓
+Spring Container
+       ↓
+Prototype requested
+       ↓
+ReportService Object 1
+```
+
+Next call:
+
+```text
+generateReport()
+       ↓
+getReportService()
+       ↓
+Spring Container
+       ↓
+Prototype requested again
+       ↓
+ReportService Object 2
+```
+
+Therefore:
+
+```text
+@Lookup Method Call
+        ↓
+Ask Spring Container
+        ↓
+Prototype Bean Requested
+        ↓
+New Object Returned
+```
+
+### 🔹 Why Does the Method Return `null`?
+
+We may write:
+
+```java
+@Lookup
+protected ReportService getReportService() {
+    return null;
+}
+```
+
+Normally, returning `null` would not make sense.
+
+But Spring replaces/overrides this method behavior at runtime.
+
+Conceptually, Spring makes it behave like:
+
+```java
+protected ReportService getReportService() {
+    return applicationContext.getBean(ReportService.class);
+}
+```
+
+So our original `return null` implementation is not what gets used when Spring manages the bean with lookup-method injection.
+
+## 🔹 How Does `@Lookup` Work Internally?
+
+Spring uses **method injection**.
+
+Conceptually:
+
+```text
+Original OrderService
+        ↓
+Spring creates runtime subclass
+        ↓
+Overrides @Lookup method
+        ↓
+getReportService()
+        ↓
+Spring Container lookup
+        ↓
+ReportService returned
+```
+
+Because Spring needs to override the lookup method, the method must be overridable.
+
+For example, making the lookup method `final` would prevent this mechanism.
+
+---
+
+## 🔹 `@Lookup` vs `ObjectProvider`
+
+Both can be used when we need dynamic access to a bean.
+
+### Using `@Lookup`
+
+```java
+@Lookup
+protected ReportService getReportService() {
+    return null;
+}
+```
+
+Spring handles the lookup through method injection.
+
+### Using `ObjectProvider`
+
+```java
+private final ObjectProvider<ReportService> provider;
+
+public OrderService(
+        ObjectProvider<ReportService> provider) {
+    this.provider = provider;
+}
+```
+
+Then:
+
+```java
+ReportService reportService =
+        provider.getObject();
+```
+
+Here, the lookup is explicit in our code.
+
+### 🎤 Interview-Ready Answer
+
+> **`@Lookup` is a Spring annotation used for method injection. It is useful when a long-lived bean such as a Singleton needs a fresh instance of a shorter-lived bean such as a Prototype. Spring overrides the method annotated with `@Lookup` at runtime, and whenever that method is called, Spring performs a bean lookup from the container. If the requested bean is Prototype scoped, a new instance is returned for each lookup.**
+
+## 🧠 Easy to Remember
+
+```text
+Singleton
+    ↓
+Needs fresh Prototype
+    ↓
+@Lookup method called
+    ↓
+Spring Container asked for Bean
+    ↓
+New Prototype returned
+```
+
+> **`@Lookup` = Ask Spring for the bean again whenever the lookup method is called.**
+
+---
 
 <h3 id="sb_030">What is Bean Lifecycle?</h3>
 
+The **Spring Bean Lifecycle** is the sequence of steps a Spring Bean goes through from **creation until destruction**.
 
+In simple terms:
+
+> **Spring creates the bean, injects its dependencies, initializes it, makes it ready for use, and finally destroys it when the container shuts down.**
+
+### 🔹 Bean Lifecycle Flow
+
+```text
+1. Bean Definition Loaded
+        ↓
+2. Bean Instantiation
+        ↓
+3. Dependency Injection
+        ↓
+4. Aware Interface Callbacks
+        ↓
+5. BeanPostProcessor - Before Initialization
+        ↓
+6. @PostConstruct
+        ↓
+7. InitializingBean.afterPropertiesSet()
+        ↓
+8. Custom initMethod
+        ↓
+9. BeanPostProcessor - After Initialization
+        ↓
+10. Bean Ready for Use
+        ↓
+11. @PreDestroy
+        ↓
+12. DisposableBean.destroy()
+        ↓
+13. Custom destroyMethod
+```
+
+
+## 1️⃣ Bean Definition Loaded
+
+Before creating the bean, Spring first has metadata describing it.
+
+For example:
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+Spring registers information such as:
+
+```text
+Bean Name
+Bean Class
+Bean Scope
+Dependencies
+Lazy/Eager Configuration
+Initialization Methods
+Destruction Methods
+```
+
+This metadata is represented internally using a `BeanDefinition`.
+
+---
+
+## 2️⃣ Bean Instantiation
+
+Spring creates the actual Java object.
+
+```text
+BeanDefinition
+      ↓
+Spring creates object
+      ↓
+OrderService instance
+```
+
+At this point, the object exists.
+
+---
+
+## 3️⃣ Dependency Injection
+
+Spring resolves and supplies the bean's dependencies.
+
+```java
+public OrderService(PaymentService paymentService) {
+    this.paymentService = paymentService;
+}
+```
+
+```text
+PaymentService
+      ↓
+Injected into
+      ↓
+OrderService
+```
+
+---
+
+## 4️⃣ Aware Interface Callbacks
+
+If the bean implements Spring `Aware` interfaces, Spring provides the requested container information.
+
+Examples:
+
+```text
+BeanNameAware
+BeanFactoryAware
+ApplicationContextAware
+```
+
+For example:
+
+```java
+@Override
+public void setBeanName(String beanName) {
+    this.beanName = beanName;
+}
+```
+
+---
+
+## 5️⃣ BeanPostProcessor - Before Initialization
+
+Registered `BeanPostProcessor`s can process the bean before initialization callbacks.
+
+Conceptually:
+
+```java
+postProcessBeforeInitialization(bean, beanName);
+```
+
+Flow:
+
+```text
+Bean
+ ↓
+BeanPostProcessor
+ ↓
+Before Initialization
+```
+
+---
+
+## 6️⃣ `@PostConstruct`
+
+Spring invokes methods annotated with `@PostConstruct`.
+
+```java
+@PostConstruct
+public void init() {
+    System.out.println("Initializing OrderService");
+}
+```
+
+This is commonly used when initialization logic should run after dependencies are available.
+
+---
+
+## 7️⃣ `InitializingBean.afterPropertiesSet()`
+
+If the bean implements:
+
+```java
+InitializingBean
+```
+
+Spring calls:
+
+```java
+afterPropertiesSet();
+```
+
+Example:
+
+```java
+@Override
+public void afterPropertiesSet() {
+    System.out.println("Initialization completed");
+}
+```
+
+---
+
+## 8️⃣ Custom `initMethod`
+
+If a custom initialization method is configured:
+
+```java
+@Bean(initMethod = "initialize")
+public PaymentClient paymentClient() {
+    return new PaymentClient();
+}
+```
+
+Spring calls:
+
+```java
+initialize();
+```
+
+---
+
+## 9️⃣ BeanPostProcessor - After Initialization
+
+Spring executes:
+
+```java
+postProcessAfterInitialization(bean, beanName);
+```
+
+This stage is especially important because infrastructure may return a **wrapped/proxied object** instead of the original object.
+
+Conceptually:
+
+```text
+Original Bean
+     ↓
+BeanPostProcessor
+     ↓
+Possible Proxy Creation
+     ↓
+Final Bean Reference
+```
+
+This is important for features based on Spring proxies, such as AOP.
+
+### 🔟 Bean Ready for Use
+
+After initialization completes:
+
+```text
+Bean Created
+    ↓
+Dependencies Injected
+    ↓
+Initialization Completed
+    ↓
+Post Processing Completed
+    ↓
+READY
+```
+
+The application can now use the bean.
+
+### 🔻 Destruction Phase
+
+When the Spring Container shuts down, destruction callbacks can run for beans whose destruction lifecycle the container manages.
+
+### 1️⃣1️⃣ `@PreDestroy`
+
+```java
+@PreDestroy
+public void cleanup() {
+    System.out.println("Cleaning resources");
+}
+```
+
+This is commonly used for cleanup logic.
+
+### 1️⃣2️⃣ `DisposableBean.destroy()`
+
+If the bean implements:
+
+```java
+DisposableBean
+```
+
+Spring calls:
+
+```java
+destroy();
+```
+
+### 1️⃣3️⃣ Custom `destroyMethod`
+
+A custom destruction method can also be configured:
+
+```java
+@Bean(destroyMethod = "close")
+public PaymentClient paymentClient() {
+    return new PaymentClient();
+}
+```
+
+Spring calls:
+
+```java
+close();
+```
+
+during destruction.
+
+### 🎯 Initialization Order
+
+If multiple initialization mechanisms are configured, remember:
+
+```text
+@PostConstruct
+      ↓
+InitializingBean.afterPropertiesSet()
+      ↓
+Custom initMethod
+```
+
+### 🎯 Destruction Order
+
+Similarly:
+
+```text
+@PreDestroy
+      ↓
+DisposableBean.destroy()
+      ↓
+Custom destroyMethod
+```
+
+### ⚠️ Important: Prototype Beans
+
+Spring does not manage the complete destruction lifecycle of prototype beans.
+
+For a prototype bean, Spring mainly handles:
+
+```text
+Creation
+   ↓
+Dependency Injection
+   ↓
+Initialization
+   ↓
+Returns Bean
+```
+
+After that, destruction/cleanup of that prototype instance is generally the application's responsibility.
+
+# ⚠️ Why Is the Destruction Lifecycle Not Automatically Managed for Prototype Beans?
+
+For a **Prototype Bean**, Spring manages the bean through **creation, dependency injection, and initialization**, but it does not automatically manage that bean instance through destruction.
+
+### 🔹 Singleton Bean
+
+For a Singleton Bean, Spring keeps the bean inside the container.
+
+```text
+Spring creates Bean
+        ↓
+Injects Dependencies
+        ↓
+Initializes Bean
+        ↓
+Spring keeps managing Bean
+        ↓
+Application runs
+        ↓
+Container shuts down
+        ↓
+Spring destroys Bean
+        ↓
+@PreDestroy ✅
+```
+
+Because Spring continues managing the Singleton Bean, it knows when the bean should be destroyed.
+
+### 🔹 Prototype Bean
+
+For a Prototype Bean:
+
+```text
+Application requests Prototype Bean
+        ↓
+Spring creates Bean
+        ↓
+Injects Dependencies
+        ↓
+Runs Initialization
+        ↓
+Returns Bean to Application
+        ↓
+Application uses Bean
+```
+
+After Spring returns the Prototype Bean, Spring does **not automatically manage the complete destruction lifecycle of that individual instance**.
+
+Therefore:
+
+```java
+@PreDestroy
+```
+
+is **not automatically called** by the container for prototype instances.
+
+### 🔹 Example
+
+```java
+@Component
+@Scope("prototype")
+public class ReportService {
+
+    @PostConstruct
+    public void init() {
+        System.out.println("ReportService Created");
+    }
+
+    @PreDestroy
+    public void destroy() {
+        System.out.println("ReportService Destroyed");
+    }
+}
+```
+
+When:
+
+```java
+ReportService report =
+        context.getBean(ReportService.class);
+```
+
+Spring performs:
+
+```text
+Create ReportService
+        ↓
+Inject Dependencies
+        ↓
+@PostConstruct ✅
+        ↓
+Return Bean
+```
+
+But Spring does not automatically perform:
+
+```text
+@PreDestroy ❌
+```
+
+for that Prototype Bean.
+
+### 🔹 Why?
+
+Spring does not know exactly when the application has finished using that particular Prototype object.
+
+For example:
+
+```text
+Prototype Object 1 → Used for 5 seconds
+
+Prototype Object 2 → Used for 10 minutes
+
+Prototype Object 3 → Used for 2 hours
+```
+
+Once those objects have been handed to application code, the container cannot automatically determine when each individual object is no longer needed.
+
+Therefore, it cannot automatically decide:
+
+```text
+"When should I run its destruction callback?"
+```
+
+### 🔹 Who Handles Cleanup?
+
+If the Prototype Bean owns resources that require explicit cleanup, the application using that bean should perform the necessary cleanup.
+
+For example:
+
+```java
+ReportService report =
+        context.getBean(ReportService.class);
+
+try {
+
+    report.generate();
+
+} finally {
+
+    report.close();
+}
+```
+
+This is especially important if the object owns resources such as:
+
+```text
+File handles
+Connections
+Streams
+Threads
+Other external resources
+```
+
+> **For a Prototype Bean, Spring manages creation, dependency injection, and initialization, but it does not automatically manage the complete destruction lifecycle. Once Spring creates and returns a Prototype Bean to the application, it does not determine when that individual instance is no longer needed. Therefore, destruction callbacks such as `@PreDestroy` are not automatically invoked, and any required resource cleanup should be handled explicitly by the application.**
+
+
+### 🎤 Interview-Ready Answer
+
+> **The Spring Bean Lifecycle starts when Spring loads the bean definition and instantiates the bean. It then resolves and injects dependencies and invokes any required Aware callbacks. After that, BeanPostProcessors run before initialization, followed by initialization callbacks such as `@PostConstruct`, `afterPropertiesSet()`, and a custom init method. BeanPostProcessors then run after initialization, where proxy creation can also occur. The bean is then ready for use. During container shutdown, Spring invokes destruction callbacks such as `@PreDestroy`, `DisposableBean.destroy()`, and configured destroy methods.**
+
+---
 
 <h3 id="sb_031">Explain the complete Spring Bean Lifecycle.</h3>
 
@@ -6830,43 +8073,793 @@ Disconnect
 
 <h3 id="sb_032">What is `@PostConstruct`?</h3>
 
+`@PostConstruct` is used to mark a method that should run **after Spring creates the bean and injects its dependencies**. It is mainly used for **initialization logic that requires the bean's dependencies to already be available**.
 
+So when `initialize()` executes, the required dependencies have already been injected.
+
+
+## 🔹 When Do We Use `@PostConstruct`?
+
+Use it when some initialization must happen **once after a bean has been created and configured**.
+
+For example:
+
+```java
+@Service
+public class ProductService {
+
+    private final ProductRepository productRepository;
+
+    private Map<Long, String> productCache;
+
+    public ProductService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
+
+    @PostConstruct
+    public void loadProducts() {
+
+        productCache = new HashMap<>();
+
+        productRepository.findAll()
+                .forEach(product ->
+                    productCache.put(
+                        product.getId(),
+                        product.getName()
+                    )
+                );
+    }
+}
+```
+
+Here:
+
+```text
+ProductService Created
+        ↓
+ProductRepository Injected
+        ↓
+@PostConstruct
+        ↓
+Load initial product data
+        ↓
+Service Ready
+```
+
+
+## 🔹 Why Not Put This Logic in the Constructor?
+
+Consider:
+
+```java
+public ProductService(ProductRepository productRepository) {
+
+    this.productRepository = productRepository;
+
+    // lots of initialization logic
+}
+```
+
+The constructor's primary purpose should generally be to establish the object's required state.
+
+If additional initialization must happen after Spring has completed dependency injection, `@PostConstruct` provides an explicit lifecycle hook.
+
+---
+
+## 🔹 Method Requirements
+
+A typical `@PostConstruct` method looks like:
+
+```java
+@PostConstruct
+public void init() {
+
+}
+```
+
+It should not require method arguments.
+
+---
+
+## ⚠️ Package Used in Modern Spring
+
+In modern Spring Boot versions using Jakarta APIs:
+
+```java
+import jakarta.annotation.PostConstruct;
+```
+
+Older applications may contain:
+
+```java
+import javax.annotation.PostConstruct;
+```
+
+---
 
 <h3 id="sb_033">What is `@PreDestroy`?</h3>
 
+`@PreDestroy` is a lifecycle annotation used to execute **cleanup logic before a Spring-managed Bean is destroyed**.
 
+It is commonly used to release resources before the Spring Container shuts down.
+
+### 🔹 Example
+
+```java
+@Service
+public class PaymentService {
+
+    @PreDestroy
+    public void cleanup() {
+        System.out.println("Cleaning up PaymentService resources");
+    }
+}
+```
+
+When the application shuts down normally:
+
+```text
+Application Running
+        ↓
+Spring Container Shutting Down
+        ↓
+@PreDestroy
+        ↓
+Cleanup Logic Executed
+        ↓
+Bean Destroyed
+```
+
+### 🔹 When Do We Use `@PreDestroy`?
+
+Use it when a Bean owns resources that require explicit cleanup.
+
+Examples:
+
+- Closing custom connections
+- Closing files or streams
+- Stopping background threads/executors
+- Unsubscribing from external resources
+- Releasing other resources owned by the Bean
+
+Example:
+
+```java
+@Component
+public class ReportService {
+
+    private final ExecutorService executor =
+            Executors.newFixedThreadPool(5);
+
+    @PreDestroy
+    public void shutdown() {
+        executor.shutdown();
+    }
+}
+```
+
+Before the Bean is destroyed, the executor is shut down properly.
+
+### 🎤 Interview-Ready Answer
+
+> **`@PreDestroy` is a lifecycle annotation used to execute cleanup logic before a Spring-managed Bean is destroyed. It is useful for releasing resources such as custom connections, executors, files, or other resources owned by the Bean. It is normally called when the Spring Container shuts down, but Spring does not automatically invoke it for Prototype Bean instances.**
+
+---
 
 <h3 id="sb_034">What is `InitializingBean`?</h3>
 
 
+`InitializingBean` is a Spring lifecycle interface used to execute **initialization logic after Spring has injected the bean's dependencies**.
+
+It provides one method:
+
+```java
+void afterPropertiesSet() throws Exception;
+```
+
+Spring automatically calls `afterPropertiesSet()` during bean initialization.
+
+
+## 🔹 Example
+
+```java
+@Service
+public class PaymentService implements InitializingBean {
+
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("PaymentService initialized");
+    }
+}
+```
+
+Spring calls:
+
+```java
+afterPropertiesSet();
+```
+
+after the bean's dependencies have been configured.
+
+---
+
+## 🔹 When Is It Used?
+
+It can be used when a bean needs to perform some initialization after its required properties/dependencies are available.
+
+For example:
+
+```java
+@Service
+public class PaymentService implements InitializingBean {
+
+    private final PaymentClient paymentClient;
+
+    public PaymentService(PaymentClient paymentClient) {
+        this.paymentClient = paymentClient;
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        paymentClient.initialize();
+    }
+}
+```
+
+### 🎤 Interview-Ready Answer
+
+> **`InitializingBean` is a Spring lifecycle interface that provides the `afterPropertiesSet()` method. Spring calls this method after the bean's dependencies have been configured, so it can be used for initialization logic. However, it creates a direct dependency on the Spring API, so `@PostConstruct` is often preferred for application-level initialization.**
+
+---
 
 <h3 id="sb_035">What is `DisposableBean`?</h3>
 
 
+`DisposableBean` is a Spring lifecycle interface used to execute **cleanup logic before a Spring-managed bean is destroyed**.
+
+It provides one method:
+
+```java
+void destroy() throws Exception;
+```
+
+Spring calls the `destroy()` method when the container is shutting down and the bean is being destroyed.
+
+---
+
+## 🔹 Example
+
+```java
+@Service
+public class PaymentService implements DisposableBean {
+
+    @Override
+    public void destroy() {
+        System.out.println("Cleaning PaymentService resources");
+    }
+}
+```
+
+The `destroy()` method can be used to release resources owned by the bean.
+
+For example:
+
+```java
+@Component
+public class FileService implements DisposableBean {
+
+    @Override
+    public void destroy() {
+        // Close files, connections, executors, etc.
+    }
+}
+```
+
+---
+
+## 🔹 When Is It Used?
+
+Use it when the bean needs cleanup before destruction, such as:
+
+- Closing connections
+- Closing files or streams
+- Stopping executors or background threads
+- Releasing resources owned by the bean
+
+## 🎤 Interview-Ready Answer
+
+> **`DisposableBean` is a Spring lifecycle interface that provides the `destroy()` method. Spring invokes this method before destroying a managed bean, so it can be used to release resources such as connections, files, or background executors. Since implementing `DisposableBean` directly couples the class to Spring, `@PreDestroy` is often preferred for application-level cleanup.**
+
+---
 
 <h3 id="sb_036">`@PostConstruct` vs `InitializingBean`</h3>
 
+Both are used to execute **initialization logic after Spring has configured the bean's dependencies**.
 
+The main difference is **how the initialization logic is defined and whether the class becomes directly dependent on Spring APIs**.
+
+---
+
+## 🔹 `@PostConstruct`
+
+`@PostConstruct` is an annotation placed on an initialization method.
+
+```java
+@Service
+public class PaymentService {
+
+    @PostConstruct
+    public void initialize() {
+        System.out.println("PaymentService initialized");
+    }
+}
+```
+
+The class does not need to implement a Spring lifecycle interface.
+
+---
+
+## 🔹 `InitializingBean`
+
+With `InitializingBean`, the class implements Spring's lifecycle interface and overrides:
+
+```java
+afterPropertiesSet()
+```
+
+Example:
+
+```java
+@Service
+public class PaymentService implements InitializingBean {
+
+    @Override
+    public void afterPropertiesSet() {
+        System.out.println("PaymentService initialized");
+    }
+}
+```
+
+This creates a direct dependency on the Spring API:
+
+```java
+implements InitializingBean
+```
+
+---
+
+## 📊 Main Difference
+
+| `@PostConstruct` | `InitializingBean` |
+|---|---|
+| Annotation-based | Interface-based |
+| Method can have a meaningful name like `initialize()` | Must implement `afterPropertiesSet()` |
+| Does not require implementing a Spring lifecycle interface | Directly depends on Spring's `InitializingBean` |
+| Usually preferred for application code | Useful when Spring-specific lifecycle integration is acceptable |
+
+---
+
+## ⚠️ If Both Are Used
+
+If the same bean uses both:
+
+```java
+@PostConstruct
+public void firstInit() {
+}
+```
+
+and:
+
+```java
+@Override
+public void afterPropertiesSet() {
+}
+```
+
+the order is:
+
+```text
+@PostConstruct
+      ↓
+InitializingBean.afterPropertiesSet()
+```
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **Both `@PostConstruct` and `InitializingBean` are used for bean initialization after dependencies are configured. `@PostConstruct` is annotation-based and does not require the class to implement a Spring lifecycle interface, whereas `InitializingBean` requires implementing Spring's `InitializingBean` interface and overriding `afterPropertiesSet()`. I generally prefer `@PostConstruct` for application code because it avoids directly coupling the class to Spring's lifecycle interface.**
+
+---
+
+# 🟢 `@PreDestroy` vs `DisposableBean`
+
+Both are used to run **cleanup logic before a Spring-managed Bean is destroyed**.
+
+The main difference is how we define the cleanup method.
+
+---
+
+## 🔹 `@PreDestroy`
+
+We annotate our own cleanup method with `@PreDestroy`.
+
+```java
+@Service
+public class PaymentService {
+
+    @PreDestroy
+    public void cleanup() {
+        System.out.println("Cleaning resources...");
+    }
+}
+```
+
+Spring calls:
+
+```java
+cleanup();
+```
+
+before destroying the Bean.
+
+---
+
+## 🔹 `DisposableBean`
+
+The class implements Spring's `DisposableBean` interface.
+
+```java
+@Service
+public class PaymentService implements DisposableBean {
+
+    @Override
+    public void destroy() {
+        System.out.println("Cleaning resources...");
+    }
+}
+```
+
+Spring calls:
+
+```java
+destroy();
+```
+
+before destroying the Bean.
+
+---
+
+## 📊 Simple Difference
+
+| `@PreDestroy` | `DisposableBean` |
+|---|---|
+| Annotation-based | Interface-based |
+| We define our own method name | Must implement `destroy()` |
+| No need to implement a Spring interface | Class becomes directly dependent on Spring's API |
+| Generally preferred for application code | Useful when Spring-specific lifecycle integration is acceptable |
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **Both `@PreDestroy` and `DisposableBean` are used for cleanup before a Spring-managed Bean is destroyed. `@PreDestroy` is annotation-based, whereas `DisposableBean` is a Spring interface that requires implementing the `destroy()` method. I generally prefer `@PreDestroy` because it avoids directly coupling the application class to Spring's `DisposableBean` interface.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+@PostConstruct  → Initialization annotation
+InitializingBean → Initialization interface
+
+@PreDestroy     → Destruction annotation
+DisposableBean  → Destruction interface
+```
+---
 
 <h3 id="sb_037">What are `initMethod` and `destroyMethod`?</h3>
 
+initMethod and destroyMethod are used to tell Spring which methods of a bean should be called automatically during initialization and destruction. They are useful when we want to define bean lifecycle behavior without using @PostConstruct, @PreDestroy, InitializingBean, or DisposableBean.
 
+initMethod and destroyMethod are custom lifecycle methods configured while defining a Spring bean. initMethod runs during bean initialization, and destroyMethod runs during bean destruction. They are especially useful for third-party classes where we cannot add Spring lifecycle annotations or implement Spring lifecycle interfaces.
+
+
+`initMethod` and `destroyMethod` are used to tell Spring:
+
+- **Which method should run when the Bean is initialized**
+- **Which method should run before the Bean is destroyed**
+
+They are configured using `@Bean`.
+
+### 🔹 Simple Example
+ 
+Suppose we have a normal Java class:
+ 
+```java
+public class PaymentClient {
+ 
+public void connect() {
+System.out.println("Payment connection started");
+}
+ 
+public void disconnect() {
+System.out.println("Payment connection closed");
+}
+}
+```
+ 
+There are no Spring annotations inside this class.
+ 
+Now we register it as a Spring Bean:
+ 
+```java
+@Configuration
+public class AppConfig {
+ 
+@Bean(
+initMethod = "connect",
+destroyMethod = "disconnect"
+)
+public PaymentClient paymentClient() {
+return new PaymentClient();
+}
+}
+```
+ 
+We are telling Spring:
+ 
+```text
+When PaymentClient Bean is initialized
+↓
+Call connect()
+ 
+ 
+When PaymentClient Bean is destroyed
+↓
+Call disconnect()
+```
+ 
+### 🔹 How It Works
+ 
+When the application starts:
+ 
+```text
+Spring creates PaymentClient
+↓
+Spring calls connect()
+↓
+PaymentClient ready
+```
+ 
+When the application shuts down:
+ 
+```text
+Spring Container shutting down
+↓
+Spring calls disconnect()
+↓
+PaymentClient destroyed
+```
+ 
+### 🔹 Why Do We Need This?
+ 
+Imagine `PaymentClient` comes from an external library.
+ 
+You cannot change its source code.
+ 
+The class already provides:
+ 
+```java
+connect();
+```
+ 
+and:
+ 
+```java
+disconnect();
+```
+ 
+You cannot add:
+ 
+```java
+@PostConstruct
+```
+ 
+or:
+ 
+```java
+@PreDestroy
+```
+ 
+because you don't own the class.
+ 
+Instead, while registering the object as a Spring Bean, you tell Spring:
+ 
+```java
+@Bean(
+initMethod = "connect",
+destroyMethod = "disconnect"
+)
+```
+ 
+So Spring knows which existing methods should be used for initialization and cleanup.
+  
+### 🎤 Interview-Ready Answer
+ 
+> **`initMethod` and `destroyMethod` are used with `@Bean` to specify custom initialization and cleanup methods. Spring calls the `initMethod` during Bean initialization and the `destroyMethod` before Bean destruction. They are particularly useful when configuring third-party classes that already provide setup and cleanup methods but cannot be modified to add Spring lifecycle annotations.**
+
+---
 
 <h3 id="sb_038">What is `@Component`?</h3>
 
+`@Component` is a Spring annotation used to tell Spring that a class should be **automatically detected, instantiated, and managed as a Spring Bean**.
+
+When component scanning finds a class annotated with `@Component`, Spring registers it in the IoC Container.
+
+### 🔹 Example
+
+```java
+@Component
+public class EmailService {
+
+    public void sendEmail() {
+        System.out.println("Email sent");
+    }
+}
 
 
 <h3 id="sb_039">What is `@Service`?</h3>
 
+`@Service` is a Spring stereotype annotation used to mark a class as part of the **service or business logic layer**.
 
+Spring detects the class during component scanning and manages it as a Spring Bean.
+
+### 🔹 Example
+
+```java
+@Service
+public class OrderService {
+
+    public void createOrder() {
+        // Business logic
+    }
+}
+```
+
+The `@Service` class usually contains the application's **business logic** and coordinates operations between controllers, repositories, and other services.
+
+---
 
 <h3 id="sb_040">What is `@Repository`?</h3>
 
 
+`@Repository` is a Spring stereotype annotation used to mark a class as part of the **data access or persistence layer**.
+
+It is generally used for classes that interact with a database.
+
+### 🔹 Example
+
+```java
+@Repository
+public class OrderRepository {
+
+    public void save(Order order) {
+        // Database operation
+    }
+}
+```
+
+The Repository layer is responsible for operations such as:
+
+```text
+Save data
+Read data
+Update data
+Delete data
+Execute database queries
+```
+
+### 🎤 Interview-Ready Answer
+
+> **`@Repository` is a Spring stereotype annotation used to identify a class as part of the persistence or data-access layer. Like `@Component`, it makes the class eligible for Spring component scanning and bean management. The important additional feature is persistence exception translation, where supported persistence exceptions can be translated into Spring's `DataAccessException` hierarchy. With Spring Data JPA repository interfaces, we usually don't need to explicitly add `@Repository` because Spring Data automatically creates and manages the repository implementation.**
+
+---
 
 <h3 id="sb_041">What is `@Controller`?</h3>
 
 
+`@Controller` is a Spring MVC stereotype annotation used to mark a class as a **web controller that handles incoming HTTP requests**.
+
+A controller receives a request, calls the required service/business logic, and returns a **view name** or response.
+
+### 🔹 Example
+
+```java
+@Controller
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/users")
+    public String getUsers(Model model) {
+
+        model.addAttribute(
+            "users",
+            userService.getUsers()
+        );
+
+        return "users";
+    }
+}
+```
+
+Here:
+
+```text
+GET /users
+     ↓
+UserController
+     ↓
+UserService
+     ↓
+Add data to Model
+     ↓
+Return "users"
+     ↓
+View rendered to client
+```
+
+The returned:
+
+```java
+return "users";
+```
+
+normally represents a **view name**, such as a Thymeleaf/JSP page, rather than the literal text `"users"` being returned in the HTTP response body.
+
+### 🔹 Can `@Controller` Return JSON?
+
+Yes, but the handler method should indicate that the return value goes into the HTTP response body.
+
+For example:
+
+```java
+@Controller
+public class UserController {
+
+    @GetMapping("/users")
+    @ResponseBody
+    public List<User> getUsers() {
+        return userService.getUsers();
+    }
+}
+```
+
+`@ResponseBody` tells Spring:
+
+```text
+Don't treat return value as View
+           ↓
+Write return value to HTTP response body
+```
+
+For REST APIs, instead of adding `@ResponseBody` to every method, we normally use:
+
+```java
+@RestController
+```
+
+### 🎤 Interview-Ready Answer
+
+> **`@Controller` is a Spring MVC stereotype annotation used to define a web controller that handles HTTP requests. Controller methods are mapped to URLs using annotations such as `@GetMapping` and `@PostMapping`. By default, a returned String is typically interpreted as a view name. If we want to return data directly in the HTTP response body, we can use `@ResponseBody`, or use `@RestController` for REST APIs.**
+
+---
 
 <h3 id="sb_042">What is `@RestController`?</h3>
 
