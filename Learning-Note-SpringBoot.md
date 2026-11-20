@@ -11073,95 +11073,1794 @@ PaymentProperties Object
 
 <h3 id="sb_058">What is `Environment`?</h3>
 
+`Environment` is a Spring interface used to **access application configuration properties and active profiles programmatically**.
 
+Instead of injecting a specific property using `@Value`, we can use `Environment` when we need to read properties dynamically in Java code.
+
+### 🔹 Example
+
+`application.properties`:
+
+```properties
+payment.url=https://payment.example.com
+payment.timeout=5000
+```
+
+Using `Environment`:
+
+```java
+@Service
+public class PaymentService {
+
+    private final Environment environment;
+
+    public PaymentService(Environment environment) {
+        this.environment = environment;
+    }
+
+    public void processPayment() {
+
+        String url =
+                environment.getProperty("payment.url");
+
+        String timeout =
+                environment.getProperty("payment.timeout");
+
+        System.out.println(url);
+        System.out.println(timeout);
+    }
+}
+```
+
+Spring returns:
+
+```text
+payment.url
+    ↓
+https://payment.example.com
+
+payment.timeout
+    ↓
+5000
+```
+
+### 🔹 Default Value
+
+We can also provide a default value:
+
+```java
+String timeout =
+        environment.getProperty(
+            "payment.timeout",
+            "3000"
+        );
+```
+
+If the property is missing:
+
+```text
+payment.timeout
+      ↓
+Not Found
+      ↓
+3000 used
+```
+
+### 🔹 Type Conversion
+
+Instead of retrieving everything as a `String`:
+
+```java
+Integer timeout =
+        environment.getProperty(
+            "payment.timeout",
+            Integer.class,
+            3000
+        );
+```
+
+Now `timeout` is directly available as:
+
+```java
+Integer
+```
+
+### 🔹 Checking Active Profiles
+
+`Environment` can also tell us which Spring profiles are active:
+
+```java
+String[] profiles =
+        environment.getActiveProfiles();
+```
+
+For example:
+
+```text
+dev
+```
+
+or:
+
+```text
+prod
+```
+
+### 🎤 Interview-Ready Answer
+
+> **`Environment` is a Spring interface used to access configuration properties and active profiles programmatically. For example, I can use `environment.getProperty("payment.timeout")` when I need to read a configuration value dynamically. For simple individual values I can use `@Value`, and for groups of related properties I generally prefer `@ConfigurationProperties`.**
+
+### 🧠 Easy to Remember
+
+```text
+Environment
+     ↓
+Access Properties Programmatically
+     +
+Check Active Profiles
+```
+
+---
 
 <h3 id="sb_059">What is `@PropertySource`?</h3>
 
+# 🟢 Q59. What is `@PropertySource`?
 
+`@PropertySource` is a Spring annotation used to **load properties from a custom `.properties` file into Spring's Environment**.
+
+It is useful when configuration is stored in a separate properties file instead of keeping everything in `application.properties`.
+
+---
+
+## 🔹 Clear Example
+
+Suppose we create:
+
+```text
+payment.properties
+```
+
+with:
+
+```properties
+payment.url=https://payment.example.com
+payment.timeout=5000
+```
+
+We can load it using:
+
+```java
+@Configuration
+@PropertySource("classpath:payment.properties")
+public class PaymentConfig {
+}
+```
+
+Now these properties become available through Spring's `Environment`.
+
+```java
+@Service
+public class PaymentService {
+
+    private final Environment environment;
+
+    public PaymentService(Environment environment) {
+        this.environment = environment;
+    }
+
+    public void printConfig() {
+
+        String url =
+                environment.getProperty("payment.url");
+
+        System.out.println(url);
+    }
+}
+```
+
+Result:
+
+```text
+https://payment.example.com
+```
+
+---
+
+## 🔹 Using `@Value`
+
+After loading the property source, properties can also be injected:
+
+```java
+@Value("${payment.timeout}")
+private int timeout;
+```
+
+---
+
+## 🔹 When Would We Use It?
+
+Suppose the application has separate configuration files:
+
+```text
+application.properties
+payment.properties
+email.properties
+integration.properties
+```
+
+We may explicitly load a custom file:
+
+```java
+@Configuration
+@PropertySource("classpath:payment.properties")
+public class PaymentConfig {
+}
+```
+
+---
+
+## ⚠️ Important Interview Point
+
+In Spring Boot, standard configuration files such as:
+
+```text
+application.properties
+application.yml
+```
+
+are loaded automatically.
+
+So we **do not need `@PropertySource`** just to load `application.properties`.
+
+`@PropertySource` is mainly useful when we explicitly need to add an additional `.properties` file to Spring's property sources.
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **`@PropertySource` is used to add a custom properties file to Spring's Environment. For example, if I have a separate `payment.properties` file, I can load it using `@PropertySource("classpath:payment.properties")` and then access those properties through `Environment` or property placeholders. In Spring Boot, `application.properties` is already loaded automatically, so `@PropertySource` is mainly useful for additional custom property files.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+payment.properties
+       ↓
+@PropertySource
+       ↓
+Spring Environment
+       ↓
+Application can access properties
+```
+
+---
 
 ## 2. Spring Internals
 
-
-
 <h3 id="sb_060">How does Spring Container start?</h3>
 
+The Spring Container starts when the application creates an `ApplicationContext`.
 
+In a Spring Boot application, this normally happens when we call:
+
+```java
+SpringApplication.run(Application.class, args);
+```
+
+---
+
+## 🔹 Example
+
+```java
+@SpringBootApplication
+public class OrderApplication {
+
+    public static void main(String[] args) {
+
+        SpringApplication.run(
+                OrderApplication.class,
+                args
+        );
+    }
+}
+```
+
+`SpringApplication.run()` starts the Spring Boot application and creates the appropriate `ApplicationContext`.
+
+---
+
+## 🔹 High-Level Startup Flow
+
+```text
+main()
+   ↓
+SpringApplication.run()
+   ↓
+Create / Prepare Environment
+   ↓
+Create ApplicationContext
+   ↓
+Load Bean Definitions
+   ↓
+Run BeanFactoryPostProcessors
+   ↓
+Register BeanPostProcessors
+   ↓
+Create Non-Lazy Singleton Beans
+   ↓
+Inject Dependencies
+   ↓
+Initialize Beans
+   ↓
+ApplicationContext Ready
+```
+
+---
+
+## 🔹 1. Prepare Environment
+
+Spring first prepares application configuration such as:
+
+```text
+application.properties
+application.yml
+Environment Variables
+System Properties
+Active Profiles
+Command-line Arguments
+```
+
+These values become part of Spring's `Environment`.
+
+---
+
+## 🔹 2. Create `ApplicationContext`
+
+Spring Boot determines which type of application is running and creates an appropriate `ApplicationContext`.
+
+Conceptually:
+
+```text
+SpringApplication.run()
+        ↓
+ApplicationContext created
+        ↓
+Spring IoC Container available
+```
+
+---
+
+## 🔹 3. Load Bean Definitions
+
+Spring discovers configuration and Bean definitions.
+
+For example:
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+Spring does not immediately start with an `OrderService` object.
+
+It first registers metadata describing the Bean:
+
+```text
+BeanDefinition
+     ↓
+Class = OrderService
+Scope = singleton
+Bean Name = orderService
+...
+```
+
+---
+
+## 🔹 4. Run `BeanFactoryPostProcessor`s
+
+Before normal Beans are created, Spring allows registered `BeanFactoryPostProcessor`s to modify Bean-definition metadata.
+
+```text
+Bean Definitions
+       ↓
+BeanFactoryPostProcessor
+       ↓
+Possibly modified Bean Definitions
+```
+
+---
+
+## 🔹 5. Register `BeanPostProcessor`s
+
+Spring registers processors that can participate in individual Bean creation and initialization.
+
+These are important for Spring features such as:
+
+```text
+Dependency Injection
+Lifecycle Annotations
+AOP / Proxy Creation
+```
+
+---
+
+## 🔹 6. Create Singleton Beans
+
+Spring then creates non-lazy singleton Beans.
+
+Example:
+
+```text
+OrderController
+OrderService
+PaymentService
+OrderRepository
+```
+
+During creation it resolves dependencies and initializes the Beans.
+
+---
+
+## 🔹 7. Application Becomes Ready
+
+Once context initialization finishes:
+
+```text
+ApplicationContext
+       ↓
+Beans Created
+       ↓
+Dependencies Resolved
+       ↓
+Beans Initialized
+       ↓
+Application Ready
+```
+
+For a web application, the embedded web server is also started as part of the Spring Boot startup process.
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **In Spring Boot, the Spring Container is started through `SpringApplication.run()`. Spring first prepares the Environment and creates the appropriate ApplicationContext. It then loads BeanDefinitions, executes BeanFactoryPostProcessors, registers BeanPostProcessors, and creates the required non-lazy singleton Beans. During Bean creation, dependencies are resolved and the Beans are initialized. Once the ApplicationContext is refreshed successfully, the Spring Container is ready and the application can start serving requests.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+SpringApplication.run()
+        ↓
+Environment
+        ↓
+ApplicationContext
+        ↓
+BeanDefinitions
+        ↓
+PostProcessors
+        ↓
+Create + Initialize Beans
+        ↓
+Container Ready
+```
+
+---
 
 <h3 id="sb_061">How does Spring discover Beans?</h3>
 
+Spring discovers Beans mainly by reading configuration metadata and registering Bean definitions with the Spring Container.
 
+Spring discovers Beans mainly through:
+
+> Component Scanning – detects classes annotated with @Component, @Service, @Repository, @Controller, etc.
+> @Bean methods – detects Beans explicitly defined inside configuration classes.
+
+Spring first registers the discovered component as a BeanDefinition, which is later used to create the actual Bean object.
 
 <h3 id="sb_062">How does Spring instantiate Beans?</h3>
 
-
+Spring instantiates a Bean based on its BeanDefinition. It determines the appropriate constructor or factory method, resolves the required constructor dependencies, and creates the object. After instantiation, Spring continues with dependency injection, initialization, and BeanPostProcessor processing.
 
 <h3 id="sb_063">How are dependencies resolved?</h3>
 
+Spring resolves dependencies primarily by type. When creating a Bean, it identifies the required dependency and searches the container for compatible Bean candidates. If exactly one candidate exists, Spring injects it. If multiple candidates exist, Spring can use mechanisms such as @Qualifier or @Primary to select one. If no suitable Bean exists, dependency resolution fails.
 
+NOTE: If no matching Bean exists, Spring cannot satisfy the required dependency and application startup can fail with an **unsatisfied-dependency** error.
+
+```text
+Required Type
+     ↓
+Find Candidate Beans
+     ↓
+One → Inject ✅
+Multiple → Resolve with @Qualifier / @Primary
+None → Dependency resolution fails ❌
+```
 
 <h3 id="sb_064">How does Spring maintain Beans internally?</h3>
 
+Spring internally maintains Beans mainly using two things:
 
+1. **BeanDefinition** – stores information about how a Bean should be created.
+2. **BeanFactory/ApplicationContext** – creates, stores, retrieves, and manages the Beans.
+
+### 🔹 Simple Flow
+
+```text
+BeanDefinition
+      ↓
+Contains Bean metadata
+      ↓
+BeanFactory creates Bean
+      ↓
+Dependencies injected
+      ↓
+Bean initialized
+      ↓
+Singleton Bean stored in Container
+      ↓
+Same Bean returned when required
+
+---
 
 <h3 id="sb_065">What is `BeanDefinition`?</h3>
 
+A `BeanDefinition` is **Spring's internal metadata that describes how a Bean should be created and configured**.
+
+Think of it as:
+
+```text
+BeanDefinition
+      =
+Recipe / Instructions for creating a Bean
+```
+
+Whereas:
+
+```text
+Bean
+      =
+Actual Java Object
+```
+
+---
+
+## 🔹 Example
+
+Suppose we have:
+
+```java
+@Service
+@Scope("singleton")
+public class OrderService {
+
+}
+```
+
+Spring internally stores information about `OrderService`, such as:
+
+```text
+Bean Name       → orderService
+Bean Class      → OrderService
+Scope           → singleton
+Lazy            → false
+Dependencies    → ...
+Init Method     → ...
+Destroy Method  → ...
+```
+
+This metadata is represented by a `BeanDefinition`.
+
+Spring later uses that information to create the actual `OrderService` object.
+
+---
+
+## 🔹 Simple Flow
+
+```text
+Spring discovers OrderService
+        ↓
+Creates BeanDefinition
+        ↓
+Stores Bean configuration/metadata
+        ↓
+Spring reads BeanDefinition
+        ↓
+Creates OrderService object
+```
+
+---
+
+## 🔹 What Can a `BeanDefinition` Contain?
+
+A `BeanDefinition` can contain information such as:
+
+- Bean class
+- Bean name
+- Bean scope
+- Constructor arguments
+- Property values
+- Dependency information
+- Lazy initialization setting
+- Initialization method
+- Destruction method
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **`BeanDefinition` is Spring's internal metadata that describes how a Bean should be created and configured. It contains information such as the Bean class, scope, dependencies, constructor arguments, lazy initialization settings, and lifecycle methods. Spring registers the BeanDefinition first and later uses it to create and manage the actual Bean instance.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+BeanDefinition
+      ↓
+Instructions / Metadata
+
+
+Bean Instance
+      ↓
+Actual Object
+```
+
+---
 
 
 <h3 id="sb_066">What is `BeanDefinitionRegistry`?</h3>
 
+`BeanDefinitionRegistry` is a Spring interface responsible for **registering, storing, and managing `BeanDefinition`s before the actual Bean objects are created**.
 
+In simple terms:
+
+> **`BeanDefinition` describes a Bean, while `BeanDefinitionRegistry` keeps track of those Bean definitions.**
+
+---
+
+## 🔹 Simple Example
+
+Suppose Spring discovers:
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+Spring creates a `BeanDefinition` for it.
+
+Conceptually:
+
+```text
+OrderService discovered
+        ↓
+BeanDefinition created
+        ↓
+Registered with BeanDefinitionRegistry
+        ↓
+Registry stores:
+"orderService" → BeanDefinition
+```
+
+The actual `OrderService` object can be created later using that definition.
+
+---
+
+## 🔹 Programmatic Example
+
+A Bean definition can also be registered manually:
+
+```java
+BeanDefinition beanDefinition =
+        new RootBeanDefinition(OrderService.class);
+
+registry.registerBeanDefinition(
+        "orderService",
+        beanDefinition
+);
+```
+
+The registry now knows:
+
+```text
+Bean Name
+    ↓
+orderService
+
+Bean Definition
+    ↓
+OrderService metadata
+```
+
+---
+
+## 🔹 Main Operations
+
+`BeanDefinitionRegistry` provides operations such as:
+
+```java
+registerBeanDefinition(...)
+```
+
+to register a definition,
+
+```java
+getBeanDefinition(...)
+```
+
+to retrieve one, and:
+
+```java
+removeBeanDefinition(...)
+```
+
+to remove one.
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **`BeanDefinitionRegistry` is a Spring interface used to register and manage BeanDefinitions. During application startup, Spring discovers Bean definitions and registers them with the registry using a Bean name. These definitions contain the metadata Spring later uses to create the actual Bean instances.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+BeanDefinition
+      ↓
+Recipe for ONE Bean
+
+
+BeanDefinitionRegistry
+      ↓
+Registry containing Bean recipes
+```
+
+---
 
 <h3 id="sb_067">What is `BeanFactoryPostProcessor`?</h3>
 
 
+`BeanFactoryPostProcessor` is a Spring interface that allows us to **modify BeanDefinition metadata before Spring creates the actual Bean objects**.
+
+The key point is:
+
+> **It works on Bean definitions, not on actual Bean instances.**
+
+---
+
+## 🔹 Simple Flow
+
+```text
+BeanDefinitions Loaded
+        ↓
+BeanFactoryPostProcessor runs
+        ↓
+BeanDefinitions can be modified
+        ↓
+Actual Beans are created
+```
+
+---
+
+## 🔹 Example
+
+```java
+@Component
+public class CustomBeanFactoryPostProcessor
+        implements BeanFactoryPostProcessor {
+
+    @Override
+    public void postProcessBeanFactory(
+            ConfigurableListableBeanFactory beanFactory) {
+
+        BeanDefinition beanDefinition =
+                beanFactory.getBeanDefinition("orderService");
+
+        beanDefinition.setLazyInit(true);
+    }
+}
+```
+
+Here, before `OrderService` is created, we change its BeanDefinition:
+
+```text
+orderService BeanDefinition
+
+lazy = false
+     ↓
+BeanFactoryPostProcessor
+     ↓
+lazy = true
+```
+
+The actual `OrderService` object has not been created yet.
+
+### 🔥 Important Point
+
+Don't confuse:
+
+```text
+BeanFactoryPostProcessor
+        ↓
+Works on BeanDefinition
+        ↓
+BEFORE Bean creation
+```
+
+with:
+
+```text
+BeanPostProcessor
+        ↓
+Works on actual Bean object
+        ↓
+DURING Bean creation/initialization
+```
+
+We'll cover `BeanPostProcessor` in the next question.
+
+### 🎤 Interview-Ready Answer
+
+> **`BeanFactoryPostProcessor` is a Spring extension point that allows us to inspect or modify BeanDefinition metadata after the Bean definitions have been loaded but before the actual Bean instances are created. For example, we can programmatically change a Bean's scope, lazy initialization setting, or property metadata before Spring instantiates that Bean.**
+
+### 🧠 Easy to Remember
+
+```text
+BeanFactoryPostProcessor
+        ↓
+Bean Definition Processor
+        ↓
+Runs before Bean objects are created
+```
+
+---
+
 
 <h3 id="sb_068">What is `BeanPostProcessor`?</h3>
 
+`BeanPostProcessor` is a Spring interface that allows us to **process or modify actual Bean objects before and after their initialization**.
 
+Unlike `BeanFactoryPostProcessor`, it works on the **Bean object itself**, not the `BeanDefinition`.
+
+---
+
+## 🔹 Two Important Methods
+
+```java
+postProcessBeforeInitialization()
+```
+
+Runs **before the Bean's initialization callbacks**.
+
+```java
+postProcessAfterInitialization()
+```
+
+Runs **after the Bean's initialization callbacks**.
+
+---
+
+## 🔹 Simple Flow
+
+```text
+Bean Object Created
+      ↓
+Dependencies Injected
+      ↓
+postProcessBeforeInitialization()
+      ↓
+Initialization
+      ↓
+postProcessAfterInitialization()
+      ↓
+Bean Ready
+```
+
+---
+
+## 🔹 Example
+
+```java
+@Component
+public class CustomBeanPostProcessor
+        implements BeanPostProcessor {
+
+    @Override
+    public Object postProcessBeforeInitialization(
+            Object bean,
+            String beanName) {
+
+        System.out.println(
+                "Before initialization: " + beanName
+        );
+
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(
+            Object bean,
+            String beanName) {
+
+        System.out.println(
+                "After initialization: " + beanName
+        );
+
+        return bean;
+    }
+}
+```
+
+If Spring creates:
+
+```java
+@Service
+public class OrderService {
+}
+```
+
+the processor can run like:
+
+```text
+OrderService created
+      ↓
+Before initialization: orderService
+      ↓
+OrderService initialized
+      ↓
+After initialization: orderService
+      ↓
+Bean ready
+```
+
+---
+
+## 🔥 Why Is `BeanPostProcessor` Important?
+
+Spring itself uses Bean post-processing infrastructure for many internal features.
+
+One important use is **wrapping a Bean with a proxy**.
+
+Conceptually:
+
+```text
+Original Bean
+      ↓
+BeanPostProcessor
+      ↓
+Proxy created if required
+      ↓
+Proxy returned as managed Bean
+```
+
+This is important for features such as Spring AOP.
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **`BeanPostProcessor` is a Spring extension point that allows us to process actual Bean instances before and after their initialization. It provides `postProcessBeforeInitialization()` and `postProcessAfterInitialization()` methods. Spring infrastructure also uses Bean post-processing for features such as proxy creation and other Bean-level processing.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+BeanFactoryPostProcessor
+        ↓
+Works on BeanDefinition
+
+
+BeanPostProcessor
+        ↓
+Works on actual Bean Object
+```
+
+---
 
 <h3 id="sb_069">`BeanFactoryPostProcessor` vs `BeanPostProcessor`</h3>
 
+The main difference is **what they process and when they execute**.
 
+| `BeanFactoryPostProcessor` | `BeanPostProcessor` |
+|---|---|
+| Works on `BeanDefinition` metadata | Works on actual Bean objects |
+| Runs before Bean objects are created | Runs during Bean initialization |
+| Can change Bean configuration | Can inspect, modify, or wrap Bean instances |
+| Example: change scope or lazy setting | Example: create/wrap Bean with a proxy |
+
+---
+
+## 🔹 Simple Flow
+
+```text
+BeanDefinition
+      ↓
+BeanFactoryPostProcessor
+      ↓
+Bean Definition Modified
+      ↓
+Bean Object Created
+      ↓
+Dependency Injection
+      ↓
+BeanPostProcessor
+Before Initialization
+      ↓
+Initialization
+      ↓
+BeanPostProcessor
+After Initialization
+      ↓
+Bean Ready
 
 <h3 id="sb_070">When does BeanPostProcessor execute?</h3>
 
+# 🟢 Q70. When Does `BeanPostProcessor` Execute?
 
+`BeanPostProcessor` executes **after a Bean object is created and its dependencies are populated, around the Bean's initialization phase**.
+
+It has two main callback methods.
+
+---
+
+## 🔹 Execution Order
+
+```text
+Bean Instantiated
+      ↓
+Dependencies Populated
+      ↓
+postProcessBeforeInitialization()
+      ↓
+Initialization Callbacks
+      ↓
+postProcessAfterInitialization()
+      ↓
+Bean Ready for Use
+
+---
 
 <h3 id="sb_071">How does `@Autowired` work internally?</h3>
 
+`@Autowired` tells Spring that a particular constructor, field, or method requires a dependency.
 
+Internally, Spring mainly uses:
+
+```text
+AutowiredAnnotationBeanPostProcessor
+        +
+BeanFactory
+```
+
+to perform the injection.
+
+---
+
+## 🔹 First Understand the Example
+
+```java
+@Service
+public class OrderService {
+
+    @Autowired
+    private PaymentService paymentService;
+}
+```
+
+And:
+
+```java
+@Service
+public class PaymentService {
+}
+```
+
+Spring has two Beans:
+
+```text
+OrderService
+PaymentService
+```
+
+But Spring still needs to understand:
+
+> `OrderService` requires `PaymentService`.
+
+That is what `@Autowired` communicates.
+
+---
+
+# 🔥 Complete Internal Flow
+
+```text
+1. Spring creates OrderService object
+           ↓
+2. AutowiredAnnotationBeanPostProcessor
+   examines OrderService
+           ↓
+3. Finds:
+   @Autowired
+   PaymentService paymentService
+           ↓
+4. Understands:
+   "OrderService needs PaymentService"
+           ↓
+5. Asks BeanFactory:
+   "Give me a Bean of type PaymentService"
+           ↓
+6. BeanFactory searches registered Beans
+           ↓
+7. Finds PaymentService Bean
+           ↓
+8. PaymentService is injected into OrderService
+           ↓
+9. OrderService continues initialization
+           ↓
+10. OrderService ready
+```
+
+---
+
+# 🔹 What Exactly Does `AutowiredAnnotationBeanPostProcessor` Do?
+
+Its main role is:
+
+```text
+Inspect Bean
+    ↓
+Find @Autowired injection points
+    ↓
+Determine required dependency
+    ↓
+Ask BeanFactory to resolve it
+    ↓
+Inject resolved dependency
+```
+
+So it does **not independently store all Beans and search everything itself**.
+
+The important separation is:
+
+```text
+AutowiredAnnotationBeanPostProcessor
+        ↓
+Finds WHERE injection is needed
+
+
+BeanFactory
+        ↓
+Resolves WHICH Bean should be injected
+```
+
+---
+
+# 🔹 What Is an Injection Point?
+
+An **injection point** is simply the location where Spring needs to provide a dependency.
+
+For example:
+
+### Field
+
+```java
+@Autowired
+private PaymentService paymentService;
+```
+
+Injection point:
+
+```text
+paymentService field
+```
+
+### Constructor
+
+```java
+@Autowired
+public OrderService(PaymentService paymentService) {
+}
+```
+
+Injection point:
+
+```text
+PaymentService constructor parameter
+```
+
+### Setter / Method
+
+```java
+@Autowired
+public void setPaymentService(
+        PaymentService paymentService) {
+}
+```
+
+Injection point:
+
+```text
+PaymentService method parameter
+```
+
+---
+
+# 🔹 How Does BeanFactory Find the Correct Bean?
+
+Suppose the required type is:
+
+```java
+PaymentService
+```
+
+BeanFactory searches its Bean definitions/candidates.
+
+### Case 1: One Matching Bean
+
+```text
+PaymentService required
+        ↓
+StripePaymentService found
+        ↓
+Inject it ✅
+```
+
+---
+
+### Case 2: Multiple Matching Beans
+
+```java
+@Service
+public class StripePaymentService
+        implements PaymentService {
+}
+```
+
+```java
+@Service
+public class RazorpayPaymentService
+        implements PaymentService {
+}
+```
+
+Now:
+
+```text
+PaymentService
+       ↓
+Two candidates
+
+StripePaymentService
+RazorpayPaymentService
+```
+
+Spring needs more information.
+
+This is where things such as:
+
+```java
+@Primary
+```
+
+or:
+
+```java
+@Qualifier
+```
+
+can help select the correct candidate.
+
+---
+
+### Case 3: No Matching Bean
+
+```text
+OrderService needs PaymentService
+        ↓
+BeanFactory searches
+        ↓
+No suitable PaymentService Bean
+        ↓
+Dependency cannot be satisfied
+        ↓
+ApplicationContext startup fails
+```
+
+---
+
+# 🔥 Final Picture
+
+```text
+OrderService
+     ↓
+@Autowired PaymentService
+     ↓
+AutowiredAnnotationBeanPostProcessor
+     ↓
+"PaymentService is required here"
+     ↓
+BeanFactory
+     ↓
+Search suitable Bean
+     ↓
+PaymentService Bean
+     ↓
+Injected into OrderService
+```
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **Internally, `@Autowired` is processed mainly by `AutowiredAnnotationBeanPostProcessor`. It identifies the injection points, such as fields, constructors, or methods, and determines the required dependency type. It then delegates dependency resolution to the `BeanFactory`, which searches for a suitable Bean candidate. If a matching Bean is found, Spring injects it. If multiple candidates exist, mechanisms such as `@Primary` and `@Qualifier` can be used to resolve the ambiguity.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+@Autowired
+     ↓
+AutowiredAnnotationBeanPostProcessor
+     ↓
+Where/what dependency is required?
+     ↓
+BeanFactory
+     ↓
+Which Bean matches?
+     ↓
+Inject Bean
+```
+
+> **AutowiredAnnotationBeanPostProcessor finds the injection point; BeanFactory resolves the dependency.**
+
+---
 
 <h3 id="sb_072">What is `AutowiredAnnotationBeanPostProcessor`?</h3>
 
+`AutowiredAnnotationBeanPostProcessor` is a Spring internal `BeanPostProcessor` responsible for processing dependency-injection annotations such as `@Autowired`.
 
+Its main job is to:
+
+```text
+Inspect Bean
+    ↓
+Find @Autowired injection points
+    ↓
+Determine required dependencies
+    ↓
+Ask BeanFactory to resolve them
+    ↓
+Inject the resolved Beans
+
+> AutowiredAnnotationBeanPostProcessor is Spring's internal BeanPostProcessor that detects @Autowired injection points on constructors, fields, and methods. It determines the required dependency and delegates the actual dependency resolution to the BeanFactory. Once the appropriate Bean is resolved, it performs the injection into the target Bean.
+
+---
 
 <h3 id="sb_073">How does Spring resolve dependency by type?</h3>
 
-
+Spring resolves dependencies primarily by type. When it finds a dependency such as PaymentService, it searches the container for Beans assignable to that type. If exactly one suitable candidate exists, Spring injects it. If multiple candidates exist, Spring uses additional information such as @Primary or @Qualifier to select the correct Bean. If no suitable candidate can be found, dependency resolution fails.
 
 <h3 id="sb_074">What happens if multiple Beans of the same type exist?</h3>
 
+If multiple Beans of the same type exist and Spring cannot determine which one should be injected, the dependency becomes ambiguous and the application can fail during startup.
 
+
+Spring sees:
+
+```text
+OrderService needs PaymentService
+             ↓
+       Two candidates
+
+StripePaymentService
+RazorpayPaymentService
+             ↓
+Which one should Spring inject?
+```
+
+If Spring cannot select a unique candidate, dependency resolution fails, commonly with:
+
+```text
+NoUniqueBeanDefinitionException
+```
+
+> **If multiple Beans are candidates for the same dependency type, Spring needs additional information to determine which Bean should be injected. If it cannot determine a unique candidate, dependency resolution fails, commonly with `NoUniqueBeanDefinitionException`. We can resolve this using `@Primary` when one Bean should be the default, or `@Qualifier` when we want to explicitly select a specific Bean at the injection point.**
+
+---
 
 <h3 id="sb_075">What is `NoUniqueBeanDefinitionException`?</h3>
 
+`NoUniqueBeanDefinitionException` occurs when Spring needs **one Bean of a particular type**, but finds **multiple matching Beans** and cannot determine which one to inject.
 
+For example, if two Beans implement the same interface and that interface is injected without further qualification, the injection can become ambiguous. We can resolve it using @Primary for a default implementation or @Qualifier to explicitly select a specific Bean.
 
 <h3 id="sb_076">What is `NoSuchBeanDefinitionException`?</h3>
 
+`NoSuchBeanDefinitionException` occurs when Spring tries to find a required Bean, but **no matching Bean is registered in the Spring Container**.
 
+### 🔹 Example
+
+```java
+public interface PaymentService {
+}
+```
+
+```java
+public class StripePaymentService
+        implements PaymentService {
+}
+```
+
+Suppose we forgot to register `StripePaymentService` as a Spring Bean.
+
+Now:
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Spring tries to resolve:
+
+```text
+PaymentService required
+        ↓
+Search Spring Container
+        ↓
+No PaymentService Bean found
+        ↓
+Dependency cannot be resolved
+```
+
+A `NoSuchBeanDefinitionException` can be part of the resulting failure.
+
+### 🔹 Common Reasons
+
+### 1. Missing Spring annotation
+
+```java
+public class StripePaymentService
+        implements PaymentService {
+}
+```
+
+Instead of:
+
+```java
+@Service
+public class StripePaymentService
+        implements PaymentService {
+}
+```
+
+### 2. Class is outside the component-scan package
+
+```text
+Application scans:
+com.example.order
+
+Bean is located:
+com.example.payment
+```
+
+and that package isn't included in scanning.
+
+### 3. Missing `@Bean` configuration
+
+For a class that should be explicitly registered:
+
+```java
+@Bean
+public PaymentClient paymentClient() {
+    return new PaymentClient();
+}
+```
+
+### 4. Wrong Bean name/type requested
+
+For example:
+
+```java
+context.getBean("wrongBeanName");
+```
+
+when no Bean exists with that name.
+
+
+### 🎤 Interview-Ready Answer
+
+> **`NoSuchBeanDefinitionException` occurs when Spring tries to resolve a Bean by type or name but no matching Bean is registered in the container. Common causes include a missing stereotype annotation such as `@Service`, the class being outside the component-scan path, a missing `@Bean` definition, or requesting an incorrect Bean name or type.**
+
+### 🧠 Easy to Remember
+
+```text
+No Bean Found
+      ↓
+NoSuchBeanDefinitionException
+```
+
+```text
+Need 1 Bean
+Found 0
+   ↓
+NoSuchBeanDefinitionException
+```
+
+---
 
 <h3 id="sb_077">What is `@Qualifier`?</h3>
 
+@Qualifier is used to resolve dependency ambiguity when multiple Beans of the same type are available. It allows us to explicitly specify which Bean should be injected at a particular injection point. For example, if both StripePaymentService and RazorpayPaymentService implement PaymentService, I can use @Qualifier("razorpayPaymentService") to tell Spring exactly which implementation I need.
 
+
+## 🔹 Example
+
+Suppose we have two implementations:
+
+```java
+public interface PaymentService {
+    void pay();
+}
+```
+
+```java
+@Service("stripePaymentService")
+public class StripePaymentService
+        implements PaymentService {
+
+    @Override
+    public void pay() {
+        System.out.println("Payment through Stripe");
+    }
+}
+```
+
+```java
+@Service("razorpayPaymentService")
+public class RazorpayPaymentService
+        implements PaymentService {
+
+    @Override
+    public void pay() {
+        System.out.println("Payment through Razorpay");
+    }
+}
+```
+
+Now `OrderService` needs `PaymentService`.
+
+Without additional information, Spring sees:
+
+```text
+PaymentService required
+        ↓
+Two candidates
+
+StripePaymentService
+RazorpayPaymentService
+```
+
+We can explicitly select one:
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(
+            @Qualifier("razorpayPaymentService")
+            PaymentService paymentService) {
+
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Now Spring knows:
+
+```text
+PaymentService required
+        ↓
+@Qualifier("razorpayPaymentService")
+        ↓
+Select RazorpayPaymentService
+        ↓
+Inject it
+```
+
+---
 
 <h3 id="sb_078">What is `@Primary`?</h3>
 
+`@Primary` is used to mark one Bean as the **default choice** when multiple Beans of the same type are available.
 
+### 🔹 Example
+
+```java
+@Service
+@Primary
+public class StripePaymentService
+        implements PaymentService {
+}
+```
+
+```java
+@Service
+public class RazorpayPaymentService
+        implements PaymentService {
+}
+```
+
+Now:
+
+```java
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Since `StripePaymentService` has:
+
+```java
+@Primary
+```
+
+Spring selects it by default.
+
+```text
+PaymentService required
+        ↓
+Multiple candidates
+        ↓
+Find @Primary
+        ↓
+StripePaymentService selected
+```
+
+### 🔹 When Should We Use It?
+
+Use `@Primary` when:
+
+> **Multiple implementations exist, but one of them should normally be used as the default throughout the application.**
+
+### 🎤 Interview-Ready Answer
+
+> **`@Primary` is used when multiple Beans of the same type exist and we want one Bean to be treated as the default candidate for dependency injection. Spring prefers the Bean marked with `@Primary` unless a more specific selection, such as `@Qualifier`, is provided at the injection point.**
+
+### 🧠 Easy to Remember
+
+```text
+@Primary
+    =
+Default Bean
+```
+
+---
 
 <h3 id="sb_079">`@Qualifier` vs `@Primary`</h3>
 
+# 🟢 Q79. `@Qualifier` vs `@Primary`
 
+Both are used when multiple Beans of the same type exist, but they solve the selection differently.
+
+| `@Primary` | `@Qualifier` |
+|---|---|
+| Marks one Bean as the **default** | Selects a **specific** Bean |
+| Defined on the Bean | Commonly used at the injection point |
+| Used automatically if no specific Bean is requested | Explicitly tells Spring which Bean to use |
+| Good when one implementation is normally preferred | Good when different implementations are needed in different places |
+
+---
+
+## 🔹 Example
+
+```java
+@Service
+@Primary
+public class StripePaymentService
+        implements PaymentService {
+}
+```
+
+```java
+@Service
+public class RazorpayPaymentService
+        implements PaymentService {
+}
+```
+
+If we simply inject:
+
+```java
+public OrderService(PaymentService paymentService) {
+    this.paymentService = paymentService;
+}
+```
+
+Spring chooses:
+
+```text
+StripePaymentService
+```
+
+because it is `@Primary`.
+
+---
+
+But if we explicitly write:
+
+```java
+public OrderService(
+        @Qualifier("razorpayPaymentService")
+        PaymentService paymentService) {
+
+    this.paymentService = paymentService;
+}
+```
+
+Spring chooses:
+
+```text
+RazorpayPaymentService
+```
+
+even though Stripe is marked `@Primary`.
+
+So:
+
+```text
+@Qualifier
+     ↓
+Specific selection
+     ↓
+Takes precedence over @Primary
+for that injection point
+```
+
+---
+
+## 🎤 Interview-Ready Answer
+
+> **`@Primary` defines the default Bean to use when multiple candidates of the same type exist, whereas `@Qualifier` explicitly selects a particular Bean for an injection point. I use `@Primary` when one implementation should normally be the default, and `@Qualifier` when a particular class requires a specific implementation. If both are present, the matching `@Qualifier` selection takes precedence for that injection point.**
+
+---
+
+## 🧠 Easy to Remember
+
+```text
+@Primary
+    ↓
+Default choice
+
+
+@Qualifier
+    ↓
+Specific choice
+```
+
+---
 
 <h3 id="sb_080">Can `@Autowired` be used on constructors?</h3>
 
